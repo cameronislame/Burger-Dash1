@@ -100,7 +100,7 @@ class Sprite {
 class Global {
     public:
 	unsigned char keys[65536];
-	bool show_name;
+	bool show_border;
 	bool show_credits;
 	int xres, yres;
 	int movie, movieStep;
@@ -120,7 +120,7 @@ class Global {
 	    logClose();
 	}
 	Global() {
-	    show_name = false;
+	    show_border = false;
 	    show_credits = false;
 	    logOpen();
 	    camera[0] = camera[1] = 0.0;
@@ -601,7 +601,7 @@ int checkKeys(XEvent *e)
 	    gl.delay += 0.005;
 	    break;
 	case XK_g:
-	    gl.show_name = !gl.show_name;
+	    gl.show_border = !gl.show_border;
 	    break;
 	case XK_c:
 	    gl.show_credits = !gl.show_credits;
@@ -946,9 +946,8 @@ void render(void)
     if (gl.movie) {
 	screenCapture();
     }
-    if (gl.show_name) {
+    if (gl.show_border) {
 	display_border(gl.xres, gl.yres);
-	display_name(10, 100);
 
     }
     if (gl.show_credits) {
