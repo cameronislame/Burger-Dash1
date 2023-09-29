@@ -14,7 +14,7 @@
 //{
     //
 //}
-/*
+
 void display_border(int xres, int yres)
 {
     // draw a border around the window
@@ -39,7 +39,7 @@ void display_border(int xres, int yres)
     glPopMatrix();
     glDisable(GL_BLEND);
 }
-
+/*
 void display_name(int x, int y)
 {
     Rect r;
