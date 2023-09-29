@@ -5,6 +5,7 @@
 
 #include <GL/glx.h>
 #include "fonts.h"
+/*
 void display_border(int xres, int yres)
 {
     //draw border around window
@@ -27,20 +28,17 @@ void display_border(int xres, int yres)
     glEnd();
     glPopMatrix();
     glDisable(GL_BLEND);
-
-
 }
+*/
 
 
-void display_name (int x , int y){
-
-
+void display_name (int x , int y)
+{
     Rect r;
     r.bot = y;
     r.left = x;
     r.center = 0;
-    ggprint8b(&r,0, 0x00000000, "Conner");
-
+    ggprint8b(&r, 0, 0x00000000, "Conner");
 }
 
 
