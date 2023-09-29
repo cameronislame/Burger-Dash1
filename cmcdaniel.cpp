@@ -9,6 +9,7 @@
 #include "cmcdaniel.h"
 #include <GL/glx.h>
 
+/*
 void display_name(int x, int y) 
 {
     Rect r;
@@ -44,7 +45,7 @@ void display_border(int xres, int yres)
     glDisable(GL_BLEND);
 
 }
-
+*/
 void display_credits(int xres, int yres) 
 {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
