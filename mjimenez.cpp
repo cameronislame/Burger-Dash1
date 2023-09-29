@@ -14,7 +14,7 @@
 //{
     //
 //}
-
+/*
 void display_border(int xres, int yres)
 {
     // draw a border around the window
@@ -49,4 +49,4 @@ void display_name(int x, int y)
     ggprint8b(&r, 0, 0x00000000, "Mario");
 
 }
-
+*/
