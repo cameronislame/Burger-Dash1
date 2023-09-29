@@ -25,6 +25,9 @@
 //#include "ppm.h"
 #include "fonts.h"
 #include "cmcdaniel.h"
+#include "cestes.h"
+#include "mjimenez.h"
+#include "jbaltazarrob.h"
 
 //defined types
 typedef double Flt;
