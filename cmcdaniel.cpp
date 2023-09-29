@@ -1,11 +1,16 @@
+/***************************************************
+ * Copyright    : 2023 Cameron McDaniel
+ * File Name    : cmcdaniel.cpp
+ * Description   : individual project source file
+***************************************************/
+
+
 #include "fonts.h"
 #include "cmcdaniel.h"
 #include <GL/glx.h>
 
 void display_name(int x, int y) 
 {
-    //draw a border around the window
-    //
     Rect r;
     r.bot = y;
     r.left = x;
@@ -42,7 +47,6 @@ void display_border(int xres, int yres)
 
 void display_credits(int xres, int yres) 
 {
-
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
     glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
