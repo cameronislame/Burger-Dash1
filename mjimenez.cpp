@@ -1,8 +1,19 @@
-// Mario Jimenez Source File
-// 09/27/2023
+/**
+ * Author: Mario Jimenez
+ * Created: 09/27/2023
+ * 
+ * (c) Copyright by 
+ * File: mjimenez.cpp
+ * Description: Mario Jimenez Source File 
+ **/
 
 #include "fonts.h"
 #include <GL/glx.h>
+
+//void start_game(int xres, int yres)
+//{
+    //
+//}
 
 void display_border(int xres, int yres)
 {
@@ -38,7 +49,4 @@ void display_name(int x, int y)
     ggprint8b(&r, 0, 0x00000000, "Mario");
 
 }
-
-
-
 
