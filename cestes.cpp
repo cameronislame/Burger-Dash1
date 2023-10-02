@@ -1,4 +1,7 @@
-//This is Conner's individual source file.
+//Author: Conner Estes
+// Created: 09/27/2023
+// Description: My individual source file for my CMPS 3350 project.
+// (c) Copyright by Conner Estes
 
 
 
