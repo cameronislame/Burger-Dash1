@@ -18,6 +18,7 @@
 // changes to main yet, until discussed.
 
 using namespace std;
+bool startScreenActive = true;
 
 //floating point random numbers
 #define rnd() (float)rand() / (float)RAND_MAX
@@ -107,14 +108,67 @@ void init_opengl(void);
 void physics(void);
 void render(void);
 
+void renderStartScreen() {
+    glClear(GL_COLOR_BUFFER_BIT);
+    // Calculate the center of the screen
+    int centerX = gl.xres / 2;
+    int centerY = gl.yres / 2;
+    // Calculate the position of the yellow square relative to the center
+    int squareWidth = 300; // Increase the size as needed
+    int squareHeight = 300;
+    int squareX = centerX - (squareWidth / 2);
+    int squareY = centerY - (squareHeight / 2);
+    // Draw the larger yellow square in the center
+    glColor3ub(255, 255, 0); // Yellow color
+    glPushMatrix();
+    glTranslatef(squareX, squareY, 0.0f);
+    glBegin(GL_QUADS);
+    glVertex2f(0, 0);
+    glVertex2f(0, squareHeight);
+    glVertex2f(squareWidth, squareHeight);
+    glVertex2f(squareWidth, 0);
+    glEnd();
+    glPopMatrix();
 
+    unsigned int c = 0xf0f000ff; // Color
+    Rect r;
+    r.bot = squareY + (squareHeight / 2); // Center vertically
+    r.left = squareX + (squareWidth / 2); // Center horizontally
+    r.center = 1;
+    ggprint8b(&r, 64, c, "Burger Dash");
+
+    r.bot = squareY - 20;
+    r.left = centerX;
+    r.center = 1;
+    ggprint8b(&r, 16, c, "Press Enter to Start");
+
+    x11.swapBuffers();
+}
+
+void waitForEnterKey() {
+    XEvent e;
+    while (startScreenActive) {
+        while (x11.getXPending()) {
+            XEvent e = x11.getXNextEvent();
+            if (e.type == KeyPress) {
+                int key = XLookupKeysym(&e.xkey, 0);
+                if (key == XK_Return) {
+                    startScreenActive = false;
+                    break;
+                }
+            }
+        }
+    }
+}
 
 //=====================================
 // MAIN FUNCTION IS HERE
 //=====================================
-int main()
-{
+
+int main() {
     init_opengl();
+    renderStartScreen(); // Display the start screen.
+    waitForEnterKey();   // Wait for Enter 
     //Main loop
     int done = 0;
     while (!done) {
@@ -125,10 +179,12 @@ int main()
             x11.check_mouse(&e);
             done = x11.check_keys(&e);
         }
-        physics();
-        render();
-        x11.swapBuffers();
-        usleep(400);
+        if (!startScreenActive) {
+            physics();
+            render();
+            x11.swapBuffers();
+            usleep(400);
+        }
     }
     return 0;
 }
@@ -420,9 +476,6 @@ void render()
     if (gl.display_credits) {
         display_credits(gl.xres, gl.yres);
     }
-
-
-
 
 
 }
