@@ -11,8 +11,8 @@
  * CODE COMES FROM GORDON WALK2*/
 Level::Level() {
         //Log("Level constructor\n");
-        tilesize[0] = 32;
-        tilesize[1] = 32;
+        tilesize[0] = 16;
+        tilesize[1] = 16;
         ftsz[0] = (Flt)tilesize[0];
         ftsz[1] = (Flt)tilesize[1];
         tile_base = 220.0;
