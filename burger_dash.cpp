@@ -26,8 +26,7 @@ bool startScreenActive = true;
 const float GRAVITY = 1.0f;
 //Camer for level render
 double camera[2] = {0.0,0.0};
-//Declare global Level class
-Level lev;
+
 
 class Global {
     public:
@@ -106,7 +105,8 @@ class X11_wrapper {
         void check_mouse(XEvent *e);
         int check_keys(XEvent *e);
 } x11;
-
+//Declare global Level class
+Level lev;
 //Function prototypes
 void init_opengl(void);
 void physics(void);
