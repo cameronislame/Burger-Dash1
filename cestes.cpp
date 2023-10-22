@@ -3,9 +3,8 @@
 // Description: My individual source file for my CMPS 3350 project.
 // (c) Copyright by Conner Estes
 
-
-
-
+//#include "burger_dash.cpp"
+#include "cestes.h"
 #include <GL/glx.h>
 #include "fonts.h"
 /*
@@ -33,6 +32,9 @@ void display_border(int xres, int yres)
     glDisable(GL_BLEND);
 }
 */
+
+
+
 
 
 void display_name (int x , int y)

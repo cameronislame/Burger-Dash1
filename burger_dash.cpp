@@ -57,7 +57,7 @@ class Obstacle {
         }
         void init() {
             pointClaimed = false;
-            vel[0] = -10.0f;
+            vel[0] = 0;
             vel[1] = 0.0f;
             width =  30.0f;
             height = 20.0f;
@@ -65,6 +65,8 @@ class Obstacle {
             pos[1] = 0.0f + height;
         }
 } spike;
+
+
 
 
 class Square {
@@ -87,6 +89,8 @@ class Square {
             pos[1] = 0.0f + height;
         }
 } burger;
+
+
 
 class X11_wrapper {
     private:
@@ -369,6 +373,8 @@ void init_opengl(void)
 }
 
 bool checkCollision(Square burger, Obstacle spike) {
+    
+
 
     // Calculate the coordinates of the bounding boxes
     int leftBurger = burger.pos[0] - burger.width;
@@ -395,9 +401,10 @@ bool checkCollision(Square burger, Obstacle spike) {
 
 void physics()
 {
+    //int tries;
 
     // spike physics
-    spike.pos[0] += spike.vel[0];
+    //spike.pos[0] += spike.vel[0];
     
     // burger physics
     // If burger is off the ground, it is subject to gravity
@@ -407,12 +414,14 @@ void physics()
     }
 
     // Update burger position based on its velocity
+    burger.pos[0] += burger.vel[0]; 
     burger.pos[1] -= burger.vel[1];
 
     // When burger hits ground, set velocity to 0
     if (burger.pos[1] <= 0 + burger.height) {
         burger.pos[1] = 0 + burger.height;
         burger.vel[1] = 0;
+        burger.vel[0] = 10;
     }
 
     if (gl.keys[XK_space]) {
@@ -422,10 +431,19 @@ void physics()
 
     // if they collide, they stop moving
     if(checkCollision(burger, spike)) {
-        spike.vel[0] = 0;
-        burger.vel[0] = 0;
-        burger.vel[1] = 0;
+        //spike.vel[0] = 10;
+        
+        burger.vel[0] = -10;
+        burger.vel[1] = -8;
+
+
+        
+       
     }
+
+    
+
+    
 
     //if we clear the obstacle we get a point
     if (burger.pos[0] - burger.width > spike.pos[0] + spike.width && !spike.pointClaimed) {
@@ -436,6 +454,9 @@ void physics()
 
 void render()
 {
+    
+
+    
     glClear(GL_COLOR_BUFFER_BIT);
     //Draw burger
     glPushMatrix();
@@ -448,6 +469,8 @@ void render()
     glVertex2f( burger.width, -burger.height);
     glEnd();
     glPopMatrix();
+
+
 
     //Render LLevel
     //========================
@@ -503,6 +526,10 @@ void render()
     }
     glColor3f(1.0, 1.0, 0.1);
     glPushMatrix();
+
+    
+    
+
 
     //draw spike
     glPushMatrix();
