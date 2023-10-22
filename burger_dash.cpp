@@ -35,6 +35,7 @@ class Global {
         int score;
         bool show_border;
         bool display_credits;
+        bool CheckCollision2;
         Global() {
             show_border = false;
             display_credits = false;
@@ -67,28 +68,8 @@ class Obstacle {
 } spike;
 
 
+//Square burger;
 
-
-class Square {
-    public:
-        float pos[2];
-        float vel[2];
-        float verts[4][2];
-        float width;
-        float height;
-        Square() {
-            init();
-
-        }
-        void init() {
-            vel[0] = 10.0f; 
-            vel[1] = 0;
-            width =  15.0f;
-            height = 15.0f;
-            pos[0] = 50.f;
-            pos[1] = 0.0f + height;
-        }
-} burger;
 
 
 
@@ -169,6 +150,8 @@ void waitForEnterKey() {
     }
 }
 
+//extern bool CheckCollision2(Square burger, Enemy enemy) ;
+
 //=====================================
 // MAIN FUNCTION IS HERE
 //=====================================
@@ -190,6 +173,8 @@ int main() {
         if (!startScreenActive) {
             physics();
             render();
+            renderEnemy();
+            //CheckCollision2();
             x11.swapBuffers();
             usleep(400);
         }
@@ -441,6 +426,10 @@ void physics()
        
     }
 
+    if(Check2(burger,enemy)){
+        burger.vel[0] = 0;
+    }
+
     
 
     
@@ -528,7 +517,7 @@ void render()
     glPushMatrix();
 
     
-    
+    //renderEnemy();    
 
 
     //draw spike
