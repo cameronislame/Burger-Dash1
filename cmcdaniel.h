@@ -8,6 +8,8 @@
 //extern void display_border(int xres, int yres);
 extern void display_credits(int xres, int yres);
 extern int total_running_time(time_t begin);
+extern int time_since_mouse_move(time_t mouse_timer);
+
 class cameron{
 	int abc;
 };

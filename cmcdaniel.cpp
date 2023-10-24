@@ -9,6 +9,7 @@
 #include "cmcdaniel.h"
 #include <GL/glx.h>
 #include <time.h>
+
 /*
 void display_name(int x, int y) 
 {
@@ -73,10 +74,14 @@ void display_credits(int xres, int yres)
   ggprint8b(&r, 16, 0x00ffff00, "Jesus Baltazar");
   ggprint8b(&r, 16, 0x00ffff00, "Mario Jimenez");
 
-
 }
 
 int total_running_time(time_t begin)
 {
-	return time(NULL) - begin;
+    return time(NULL) - begin;    
+}
+
+int time_since_mouse_move(time_t mouse_timer)
+{
+    return time(NULL) - mouse_timer;
 }
