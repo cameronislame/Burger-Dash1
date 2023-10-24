@@ -36,9 +36,11 @@ class Global {
         bool show_border;
         bool display_credits;
         bool CheckCollision2;
+        bool display_statistics;
         Global() {
             show_border = false;
             display_credits = false;
+            display_statistics = false;
             xres = 1200;
             yres = 600;
             score = 0;
@@ -334,6 +336,9 @@ int X11_wrapper::check_keys(XEvent *e)
             case XK_c:
                 gl.display_credits = !gl.display_credits;
                 break;
+            case XK_s:
+                gl.display_statistics = !gl.display_statistics;
+                break;
         }
     }
     return 0;
@@ -542,6 +547,7 @@ void render()
     ggprint8b(&r, 16, c, "Press R to reset obstacle");
     ggprint8b(&r, 16, c, "Press G for border");
     ggprint8b(&r, 16, c, "Press C for credits");
+    ggprint8b(&r, 16, c, "Press S for statistics");
     ggprint8b(&r, 16, c, "score: %i", gl.score);
 
     if (gl.show_border) {
@@ -551,6 +557,22 @@ void render()
     if (gl.display_credits) {
         display_credits(gl.xres, gl.yres);
     }
+
+    if (gl.display_statistics) {
+        Rect r1;
+        r1.bot = 20;
+        r1.left = 10;
+        r1.center = 0;
+
+        ggprint8b(&r1, 16, c, "STATISTICS");
+        
+        /* uncomment once yours works :D
+        ggprint8b(&r1, 16, c, "n physics calls: %i", total_physics_function_calls());
+        ggprint8b(&r1, 16, c, "n render calls: %i", total_render_function_calls());
+        ggprint8b(&r1, 16, c, "time since last key press: %i seconds", time_since_key_press());
+        ggprint8b(&r1, 16, c, "time elapsed: %i seconds", total_running_time());
+        */
+        }
 
 
 }
