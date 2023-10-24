@@ -577,7 +577,7 @@ void render()
 
     if (gl.display_statistics) {
         Rect r1;
-        r1.bot = 80;
+        r1.bot = 90;
         r1.left = 10;
         r1.center = 0;
 
