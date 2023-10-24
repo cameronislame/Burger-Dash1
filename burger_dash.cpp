@@ -596,7 +596,7 @@ void render()
         ggprint8b(&r1, 16, c, "STATISTICS");
         
         // uncomment once yours works :D
-        ggprint8b(&r1, 16, c, "n physics calls: %i", total_physics_function_calls());
+        //ggprint8b(&r1, 16, c, "n physics calls: %i", total_physics_function_calls());
         ggprint8b(&r1, 16, c, "n render calls: %f", total_render_function_calls());
         ggprint8b(&r1, 16, c, "time since last key press: %i seconds", time_since_key_press(gl.key_checker));
         
