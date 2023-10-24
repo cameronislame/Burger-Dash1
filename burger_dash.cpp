@@ -312,7 +312,7 @@ void X11_wrapper::check_mouse(XEvent *e)
             savex = e->xbutton.x;
             savey = e->xbutton.y;
             //Code placed here will execute whenever the mouse moves.
-            time(&gl.mouse_timer);
+            time_since_mouse_move(true);
 
         }
     }
@@ -589,7 +589,7 @@ void render()
         ggprint8b(&r1, 16, c, "time since last key press: %i seconds", time_since_key_press(gl.key_checker));
         
         ggprint8b(&r1, 16, c, "time elapsed: %i seconds", total_running_time(gl.begin));
-        ggprint8b(&r1, 16, c, "time since last mouse move: %i seconds", time_since_mouse_move(gl.mouse_timer));
+        ggprint8b(&r1, 16, c, "time since last mouse move: %i seconds", time_since_mouse_move(false));
         }
 
 
