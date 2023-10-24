@@ -88,13 +88,27 @@ void renderEnemy() {
     glVertex2f(enemy.width, -enemy.height);
     glEnd();
     glPopMatrix();
-}
-int total_physics_function_calls(){
+}int total_physics_function_calls(){
+    static int firsttime = 1;
+    static int physics_count;
+    if (firsttime){
 
-    physics_count++;
+        physics_count =0;
+        firsttime = 0;
+    }
 
-    return physics_count;
+    else{
+        physics_count++;
+    }
+
+
+
+
+
+   return physics_count;
+
 }
+
 
 
 
