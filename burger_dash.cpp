@@ -159,26 +159,7 @@ void waitForEnterKey() {
 }
 
 //extern bool CheckCollision2(Square burger, Enemy enemy) ;
-int total_physics_function_calls(){
-    static int firsttime = 1;
-    static int physics_count;
-    if (firsttime){
 
-        physics_count =0;
-        firsttime = 0;
-    }
-
-    else{
-        physics_count++;
-    }
-
-
-
-
-
-   return physics_count;
-
-}
 
 //=====================================
 // MAIN FUNCTION IS HERE
@@ -603,7 +584,7 @@ void render()
         ggprint8b(&r1, 16, c, "STATISTICS");
         
         // uncomment once yours works :D
-        //ggprint8b(&r1, 16, c, "n physics calls: %i", total_physics_function_calls());
+        ggprint8b(&r1, 16, c, "n physics calls: %i", total_physics_function_calls());
         ggprint8b(&r1, 16, c, "n render calls: %f", total_render_function_calls());
         ggprint8b(&r1, 16, c, "time since last key press: %i seconds", time_since_key_press(gl.key_checker));
         
