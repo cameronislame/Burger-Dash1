@@ -7,7 +7,7 @@
  **/
 /*Header files that will define level design and objects implementation*/
 typedef double Flt;
-
+extern float render_val_count;
 class Level {
     public:
     unsigned char arr[16][80];
@@ -18,4 +18,6 @@ class Level {
     Level();
     void removeCrLf(char *str);
 };
+void render_calls();
+float total_render_function_calls();
 #endif
