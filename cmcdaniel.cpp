@@ -81,7 +81,11 @@ int total_running_time(time_t begin)
     return time(NULL) - begin;    
 }
 
-int time_since_mouse_move(time_t mouse_timer)
+int time_since_mouse_move(const bool get)
 {
+    static time_t mouse_timer;
+    if(get) {
+        time(&mouse_timer);
+    }
     return time(NULL) - mouse_timer;
 }
