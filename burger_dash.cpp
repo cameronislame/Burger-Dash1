@@ -577,10 +577,10 @@ void render()
         
         // uncomment once yours works :D
         //ggprint8b(&r1, 16, c, "n physics calls: %i", total_physics_function_calls());
-        //ggprint8b(&r1, 16, c, "n render calls: %i", total_render_function_calls());
+        ggprint8b(&r1, 16, c, "n render calls: %i", total_render_function_calls());
         ggprint8b(&r1, 16, c, "time since last key press: %i seconds", time_since_key_press(gl.key_checker));
         
-        ggprint8b(&r1, 16, c, "time elapsed: %i seconds", total_running_time(gl.begin));
+        ggprint8b(&r1, 16, c, "time elapsed: %f seconds", total_running_time(gl.begin));
         ggprint8b(&r1, 16, c, "time since last mouse move: %i seconds", time_since_mouse_move(gl.mouse_timer));
         }
 
