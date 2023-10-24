@@ -35,7 +35,7 @@ void display_border(int xres, int yres)
 
 
 Square burger;
-
+int physics_count;
 
 
 void display_name (int x , int y)
@@ -89,6 +89,13 @@ void renderEnemy() {
     glEnd();
     glPopMatrix();
 }
+int total_physics_function_calls(){
+
+    physics_count++;
+
+    return physics_count;
+
+
 
 // ... other definitions ...
 
