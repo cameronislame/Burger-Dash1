@@ -71,7 +71,7 @@ class Square {
 extern Square burger;
 
 
-
+int total_physics_function_calls();
 void renderEnemy();
 
 // cestes.h
