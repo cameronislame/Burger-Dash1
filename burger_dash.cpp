@@ -37,6 +37,7 @@ class Global {
         bool display_credits;
         bool CheckCollision2;
         bool display_statistics;
+        time_t begin;
         Global() {
             show_border = false;
             display_credits = false;
@@ -44,6 +45,7 @@ class Global {
             xres = 1200;
             yres = 600;
             score = 0;
+            time(&begin);
         }
 } gl;
 
@@ -566,12 +568,12 @@ void render()
 
         ggprint8b(&r1, 16, c, "STATISTICS");
         
-        /* uncomment once yours works :D
-        ggprint8b(&r1, 16, c, "n physics calls: %i", total_physics_function_calls());
-        ggprint8b(&r1, 16, c, "n render calls: %i", total_render_function_calls());
-        ggprint8b(&r1, 16, c, "time since last key press: %i seconds", time_since_key_press());
-        ggprint8b(&r1, 16, c, "time elapsed: %i seconds", total_running_time());
-        */
+        // uncomment once yours works :D
+        //ggprint8b(&r1, 16, c, "n physics calls: %i", total_physics_function_calls());
+        //ggprint8b(&r1, 16, c, "n render calls: %i", total_render_function_calls());
+        //ggprint8b(&r1, 16, c, "time since last key press: %i seconds", time_since_key_press());
+        ggprint8b(&r1, 16, c, "time elapsed: %i seconds", total_running_time(gl.begin));
+        
         }
 
 
