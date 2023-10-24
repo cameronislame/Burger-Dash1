@@ -39,6 +39,7 @@ class Global {
         bool display_statistics;
         time_t begin;
         time_t mouse_timer;
+        time_t key_checker;
         Global() {
             show_border = false;
             display_credits = false;
@@ -48,6 +49,7 @@ class Global {
             score = 0;
             time(&begin);
             time(&mouse_timer);
+            time(&key_checker);
         }
 } gl;
 
@@ -320,8 +322,11 @@ int X11_wrapper::check_keys(XEvent *e)
     if (e->type != KeyPress && e->type != KeyRelease)
         return 0;
     int key = XLookupKeysym(&e->xkey, 0);
-    if (e->type == KeyPress)
+    if (e->type == KeyPress) {
         gl.keys[key] = 1;
+        time(&gl.key_checker);
+    }
+
     if (e->type == KeyRelease)
         gl.keys[key] = 0;
     if (e->type == KeyPress) {
@@ -452,7 +457,7 @@ void physics()
 
 void render()
 {
-    render_calls();
+    
 
     
     glClear(GL_COLOR_BUFFER_BIT);
@@ -564,7 +569,7 @@ void render()
 
     if (gl.display_statistics) {
         Rect r1;
-        r1.bot = 40;
+        r1.bot = 80;
         r1.left = 10;
         r1.center = 0;
 
@@ -573,7 +578,7 @@ void render()
         // uncomment once yours works :D
         //ggprint8b(&r1, 16, c, "n physics calls: %i", total_physics_function_calls());
         //ggprint8b(&r1, 16, c, "n render calls: %i", total_render_function_calls());
-        //ggprint8b(&r1, 16, c, "time since last key press: %i seconds", time_since_key_press());
+        ggprint8b(&r1, 16, c, "time since last key press: %i seconds", time_since_key_press(gl.key_checker));
         
         ggprint8b(&r1, 16, c, "time elapsed: %i seconds", total_running_time(gl.begin));
         ggprint8b(&r1, 16, c, "time since last mouse move: %i seconds", time_since_mouse_move(gl.mouse_timer));
