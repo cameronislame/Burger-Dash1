@@ -39,7 +39,6 @@ class Global {
         double delay;
         bool display_statistics;
         time_t begin;
-        time_t mouse_timer;
         time_t key_checker;
         Global() {
             show_border = false;
@@ -50,7 +49,6 @@ class Global {
             score = 0;
             delay = 0.1;
             time(&begin);
-            time(&mouse_timer);
             time(&key_checker);
         }
 } gl;
