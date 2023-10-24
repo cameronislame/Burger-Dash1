@@ -9,7 +9,7 @@
 */
 /*LEVEL CLASS INITIALIZATION
  * CODE COMES FROM GORDON WALK2*/
-extern float render_val_count;
+float render_val_count = 0;
 Level::Level() {
         //Log("Level constructor\n");
         tilesize[0] = 16;
@@ -53,5 +53,9 @@ void Level::removeCrLf(char *str) {
         ++p;
         }
 }
-void render_calls();
-float total_render_function_calls();
+void render_calls(){
+    render_val_count = render_val_count + 1;
+}
+float total_render_function_calls(){
+    return render_val_count;
+}
