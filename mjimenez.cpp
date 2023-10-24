@@ -1,19 +1,32 @@
 /**
  * Author: Mario Jimenez
  * Created: 09/27/2023
- * 
- * (c) Copyright by 
  * File: mjimenez.cpp
  * Description: Mario Jimenez Source File 
  **/
 
+#include "mjimenez.h"
 #include "fonts.h"
 #include <GL/glx.h>
+#include <time.h>
+/*
+int time_since_key_press(const bool get) {
+    static int check_keys = 1;
+    static int start_time;
+    if (check_keys) {
+        start_time = time(NULL);
+        check_keys = 0;
+    }
+    if (get) {
+        return time(NULL) - start_time;
+    }
+    return 0;
+}
+*/
 
-//void start_game(int xres, int yres)
-//{
-    //
-//}
+int time_since_key_press(time_t begin) {
+        return time(NULL) - begin;
+}
 
 void display_border(int xres, int yres)
 {
