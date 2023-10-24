@@ -36,6 +36,7 @@ class Global {
         bool show_border;
         bool display_credits;
         bool CheckCollision2;
+        double delay;
         bool display_statistics;
         time_t begin;
         time_t mouse_timer;
@@ -47,6 +48,7 @@ class Global {
             xres = 1200;
             yres = 600;
             score = 0;
+            delay = 0.1;
             time(&begin);
             time(&mouse_timer);
             time(&key_checker);
