@@ -452,7 +452,7 @@ void physics()
 
 void render()
 {
-    
+    render_calls();
 
     
     glClear(GL_COLOR_BUFFER_BIT);
