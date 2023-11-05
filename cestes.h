@@ -15,11 +15,28 @@
 #ifndef _CESTES_H_
 #define _CESTES_H_
 
+class Stove {
+    public:
+        float pos[2];
+        float vel[2];
+        float width;
+        float height;
+        Stove(){
+            init();
+        }
+        void init(){
+            width = 30.0f;
+            height = 3.0f;
+        }
+};
+
+
 
 
 class Enemy {
 public:
     float pos[2];
+    float vel[2];
     float width;
     float height;
     Enemy() {
@@ -30,6 +47,7 @@ public:
         height = 30.0f;
         pos[0] = 600.0f;
         pos[1] = 0.0f + height;
+        vel[0] = -12.0f;
     }
 };
 
@@ -59,7 +77,7 @@ class Square {
 
         }
         void init() {
-            vel[0] = 10.0f;
+            vel[0] = 5.0f;
             vel[1] = 0;
             width =  15.0f;
             height = 15.0f;

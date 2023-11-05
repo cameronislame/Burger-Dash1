@@ -7,6 +7,9 @@
 #include "cestes.h"
 #include <GL/glx.h>
 #include "fonts.h"
+#include <ctime>
+#include <cstring>
+#include <unistd.h>
 /*
 void display_border(int xres, int yres)
 {
@@ -110,6 +113,24 @@ void renderEnemy() {
 }
 
 
+const double physicsRate = 1.0 / 120.0;
+const double oobillion = 1.0 / 1e9;
+struct timespec timeStart, timeCurrent;
+struct timespec timePause;
+double physicsCountdown=0.0;
+double timeSpan=0.0;
+//unsigned int upause=0;
+double timeDiff(struct timespec *start, struct timespec *end)
+{
+    //return the difference in two times.
+    return (double)(end->tv_sec - start->tv_sec ) +
+        (double)(end->tv_nsec - start->tv_nsec) * oobillion;
+}
+void timeCopy(struct timespec *dest, struct timespec *source)
+{
+    //copy one time structure to another.
+    memcpy(dest, source, sizeof(struct timespec));
+}
 
 
 // ... other definitions ...

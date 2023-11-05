@@ -27,10 +27,23 @@ const float GRAVITY = 1.0f;
 //Camer for level render
 double camera[2] = {0.0,0.0};
 
+//set up timers
+
+const double physicsRate = 1.0/18.0;
+extern struct timespec timeStart, timeCurrent;
+extern struct timespec timePause;
+extern double physicsCountdown;
+extern double timeSpan;
+extern double timeDiff(struct timespec *start, struct timespec *end);
+extern void timeCopy(struct timespec *dest, struct timespec *source);
+
+
 
 class Global {
     public:
         int xres, yres;
+        double physicsCountdown;
+        double timeSpan;
         unsigned int keys[65536];
         int score;
         bool show_border;
@@ -66,7 +79,7 @@ class Obstacle {
         }
         void init() {
             pointClaimed = false;
-            vel[0] = 0;
+            vel[0] = -5.0f;
             vel[1] = 0.0f;
             width =  30.0f;
             height = 20.0f;
@@ -166,6 +179,8 @@ void waitForEnterKey() {
 //=====================================
 
 int main() {
+    clock_gettime(CLOCK_REALTIME, &timePause);
+    clock_gettime(CLOCK_REALTIME, &timeStart);
     init_opengl();
     renderStartScreen(); // Display the start screen.
     waitForEnterKey();   // Wait for Enter 
@@ -179,10 +194,28 @@ int main() {
             x11.check_mouse(&e);
             done = x11.check_keys(&e);
         }
+        clock_gettime(CLOCK_REALTIME, &timeCurrent);
+        timeSpan = timeDiff(&timeStart, &timeCurrent);
+        timeCopy(&timeStart, &timeCurrent);
+        physicsCountdown += timeSpan;
+        while (physicsCountdown >= physicsRate) {
+            physics();
+            physicsCountdown -= physicsRate;
+            render();
+            
+        }
+        render();
+        x11.swapBuffers();
+        //usleep(1000);
+
+         
+
+
+
         if (!startScreenActive) {
             physics();
             render();
-            renderEnemy();
+            //renderEnemy();
             //CheckCollision2();
             x11.swapBuffers();
             usleep(400);
@@ -336,6 +369,7 @@ int X11_wrapper::check_keys(XEvent *e)
                 //Key R was pressed
                 burger.init();
                 spike.init();
+                enemy.init();
                 break;
             case XK_Escape:
                 //Escape key was pressed
@@ -404,8 +438,10 @@ void physics()
     //int tries;
 
     // spike physics
-    //spike.pos[0] += spike.vel[0];
-    
+    spike.pos[0] += spike.vel[0];
+
+    enemy.pos[0] += enemy.vel[0];
+
     // burger physics
     // If burger is off the ground, it is subject to gravity
     if(burger.pos[1] > 0 + burger.height && !checkCollision(burger, spike)) {
@@ -429,7 +465,7 @@ void physics()
             burger.vel[1] -= 10.0f; 
     }
 
-    // if they collide, they stop moving
+    // if they collide, send burger back a bit
     if(checkCollision(burger, spike)) {
         //spike.vel[0] = 10;
         
@@ -441,13 +477,28 @@ void physics()
        
     }
 
+    if (enemy.pos[0] <= 400.0f){
+        enemy.vel[0] = 8.0;
+
+    }
+
+    if (enemy.pos[0] >= 600.0f) {
+        enemy.vel[0] = -12.0;
+
+    }
+
+  
+
+
     if(Check2(burger,enemy)){
         burger.vel[0] = 0;
+        
+
     }
 
     for(int i = 0; i<50; i++){
         //render the level while burger is in motion
-        if(burger.vel[0] > 0.0){
+        if(burger.vel[0] >= 0.0){
             camera[0] += 2.0/lev.tilesize[0] * (0.05 / gl.delay);
             if (camera[0] < 0.0)
                 camera[0] = 0.0;
@@ -539,7 +590,7 @@ void render()
     glPushMatrix();
 
     
-    //renderEnemy();    
+    renderEnemy();    
 
 
     //draw spike
