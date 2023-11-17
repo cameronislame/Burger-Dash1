@@ -543,9 +543,9 @@ void render()
     //Draw burger
     
     renderHealth();
+    renderLevel(lev, gl, camera);
 
-
-
+    //render burger
     glPushMatrix();
     glColor3ub(250,250,250);
     glTranslatef(burger.pos[0], burger.pos[1], 0.0f);
@@ -556,11 +556,6 @@ void render()
     glVertex2f( burger.width, -burger.height);
     glEnd();
     glPopMatrix();
-
-
-    renderLevel(lev, gl, camera);
-    
-
     
     renderEnemy();    
 
