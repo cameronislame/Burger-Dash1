@@ -83,7 +83,7 @@ class Obstacle {
             vel[1] = 0.0f;
             width =  30.0f;
             height = 20.0f;
-            pos[0] = 400.0f;
+            pos[0] = 900.0f;
             pos[1] = 0.0f + height;
         }
 } spike;
@@ -215,6 +215,7 @@ int main() {
         if (!startScreenActive) {
             physics();
             render();
+            //renderHealth();
             //renderEnemy();
             //CheckCollision2();
             x11.swapBuffers();
@@ -370,6 +371,7 @@ int X11_wrapper::check_keys(XEvent *e)
                 burger.init();
                 spike.init();
                 enemy.init();
+                healthbar.init();
                 break;
             case XK_Escape:
                 //Escape key was pressed
@@ -435,6 +437,7 @@ bool checkCollision(Square burger, Obstacle spike) {
 
 void physics()
 {
+    bool enemyCollisionOccurred = false;
     //int tries;
 
     // spike physics
@@ -457,30 +460,30 @@ void physics()
     if (burger.pos[1] <= 0 + burger.height) {
         burger.pos[1] = 0 + burger.height;
         burger.vel[1] = 0;
-        burger.vel[0] = 10;
+        //burger.vel[0] = 10;
     }
 
     if (gl.keys[XK_space]) {
         if (burger.pos[1] == 0 + burger.height)
-            burger.vel[1] -= 10.0f; 
+            burger.vel[1] -= 13.0f; 
     }
 
     // if they collide, send burger back a bit
     if(checkCollision(burger, spike)) {
         //spike.vel[0] = 10;
         
-        burger.vel[0] = -10;
-        burger.vel[1] = -8;
+        //burger.vel[0] = -10;
+        burger.vel[1] = 0;
 
 
         
        
     }
 
-    if (enemy.pos[0] <= 400.0f){
+    /*if (enemy.pos[0] <= 400.0f){
         enemy.vel[0] = 8.0;
 
-    }
+    }*/
 
     if (enemy.pos[0] >= 600.0f) {
         enemy.vel[0] = -12.0;
@@ -491,7 +494,7 @@ void physics()
 
 
     if(Check2(burger,enemy)){
-        burger.vel[0] = 0;
+        burger.vel[0] = enemy.vel[0];
         
 
     }
@@ -500,8 +503,9 @@ void physics()
         //render the level while burger is in motion
         if(burger.vel[0] >= 0.0){
             camera[0] += 2.0/lev.tilesize[0] * (0.05 / gl.delay);
-            if (camera[0] < 0.0)
+            if (camera[0] < 0.0) {
                 camera[0] = 0.0;
+            }
         }
     }
 
@@ -512,7 +516,22 @@ void physics()
         spike.pointClaimed = true;
         gl.score += 1;
     }
+
+
+
+
+    if ((checkCollision(burger, spike)) || ((Check2(burger, enemy))) && !enemyCollisionOccurred ) {
+        healthbar.health = healthbar.health - 20;  // Adjust the amount based on your game's design
+        enemyCollisionOccurred  = 1;
+        if (healthbar.health <= 0) {
+            healthbar.health = 0;
+        }
+
+      }
 }
+
+
+
 
 void render()
 {
@@ -521,6 +540,11 @@ void render()
     
     glClear(GL_COLOR_BUFFER_BIT);
     //Draw burger
+    
+    renderHealth();
+
+
+
     glPushMatrix();
     glColor3ub(250,250,250);
     glTranslatef(burger.pos[0], burger.pos[1], 0.0f);

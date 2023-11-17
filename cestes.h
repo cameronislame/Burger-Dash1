@@ -27,6 +27,7 @@ class Stove {
         void init(){
             width = 30.0f;
             height = 3.0f;
+            pos[0] = 1000.0f;
         }
 };
 
@@ -45,7 +46,7 @@ public:
     void init() {
         width = 30.0f;
         height = 30.0f;
-        pos[0] = 600.0f;
+        pos[0] = 1000.0f;
         pos[1] = 0.0f + height;
         vel[0] = -12.0f;
     }
@@ -57,10 +58,26 @@ extern Enemy enemy;
 
 #endif // _CESTES_H_
 
+class Health {
+    public:
+        int health;
+        float pos[2];
+        //loat verts[4][2];
+        float width;
+        float height;
+        Health() {
+            init();
+        }
+        void init() {
+            health = 255;
+            pos[0] = 1000.0f;
+            width = 80.0f;
+            height = 10.0f;
+            pos[1] = 500.0f + height;
+        }
+};
 
-
-
-
+extern Health healthbar;
 
 
 
@@ -77,11 +94,11 @@ class Square {
 
         }
         void init() {
-            vel[0] = 5.0f;
+            vel[0] = 0.0f;
             vel[1] = 0;
             width =  15.0f;
             height = 15.0f;
-            pos[0] = 50.f;
+            pos[0] = 500.0f;
             pos[1] = 0.0f + height;
         }
 };
@@ -98,4 +115,5 @@ void renderEnemy();
 
 //extern void display_border(int xres, int yres);
 extern void display_name(int, int);
+void renderHealth();
 bool Check2(Square burger, Enemy enemy);

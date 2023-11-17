@@ -57,6 +57,7 @@ Enemy enemy;  // Definition of the enemy variable
 
 // Definition of the collision detection function
 bool Check2(Square burger, Enemy enemy) {
+    bool enemyCollisionOccurred = false;
     int leftBurger = burger.pos[0] - burger.width;
     int rightBurger = burger.pos[0] + burger.width;
     int topBurger = burger.pos[1] - burger.height;
@@ -67,7 +68,7 @@ bool Check2(Square burger, Enemy enemy) {
     int topEnemy = enemy.pos[1] - enemy.height;
     int bottomEnemy = enemy.pos[1] + enemy.height;
 
-    if (rightBurger < leftEnemy || rightEnemy < leftBurger)
+    if (rightBurger <= leftEnemy || rightEnemy <= leftBurger)
         return false;
 
     if (bottomBurger < topEnemy || bottomEnemy < topBurger)
@@ -131,6 +132,46 @@ void timeCopy(struct timespec *dest, struct timespec *source)
     //copy one time structure to another.
     memcpy(dest, source, sizeof(struct timespec));
 }
+
+Health healthbar;
+void renderHealth() {
+    int green;
+    int red;
+    //Health healthbar;
+    if (healthbar.health > 170) {
+        green = 255;
+        red = 0;
+    }
+
+    else if (healthbar.health < 170 && healthbar.health > 85 ) {
+            red = 255;
+            green = 255;
+    }
+    if (healthbar.health < 85) {
+        red = 255;
+        green = 0;
+
+    }
+
+    glPushMatrix();
+    glColor3ub(red, green, 0);  // Green color
+    glTranslatef(healthbar.pos[0], healthbar.pos[1], 0.0f);
+    glBegin(GL_QUADS);
+    glVertex2f(-healthbar.width, -healthbar.height);
+    glVertex2f(-healthbar.width, healthbar.height);
+    glVertex2f(healthbar.width, healthbar.height);
+    glVertex2f(healthbar.width, -healthbar.height);
+    glEnd();
+    glPopMatrix();
+
+
+
+}
+
+
+
+// burger_dash.cpp
+
 
 
 // ... other definitions ...
