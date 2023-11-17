@@ -10,7 +10,7 @@ typedef double Flt;
 extern float render_val_count;
 class Level {
     public:
-    unsigned char arr[16][80];
+    unsigned char arr[52][304];
     int nrows, ncols;
     int tilesize[2];
     Flt ftsz[2];

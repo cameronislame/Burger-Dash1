@@ -2,51 +2,52 @@
  * Copyright    : 2023 Cameron McDaniel
  * File Name    : cmcdaniel.cpp
  * Description   : individual project source file
-***************************************************/
+ ***************************************************/
 
 
 #include "fonts.h"
 #include "cmcdaniel.h"
+#include "jbaltazarrob.h"
 #include <GL/glx.h>
 #include <time.h>
 
 /*
-void display_name(int x, int y) 
-{
-    Rect r;
-    r.bot = y;
-    r.left = x;
-    r.center = 0;
-    ggprint8b(&r, 0, 0x00ffff00, "Cameron");
+   void display_name(int x, int y) 
+   {
+   Rect r;
+   r.bot = y;
+   r.left = x;
+   r.center = 0;
+   ggprint8b(&r, 0, 0x00ffff00, "Cameron");
 
-}
+   }
 
-void display_border(int xres, int yres)
-{
-    int b = 50;
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_BLEND);
-    glColor4f(1.0f, 1.0f, 0.0f, 0.5f);
-    glPushMatrix();
-    glBegin(GL_TRIANGLE_STRIP);
-        glVertex2i(0,      0);
-        glVertex2i(0+b,    0+b);
-        glVertex2i(0,      0+yres);
-        glVertex2i(0+b,    0+yres-b);
-        glVertex2i(xres,   0+yres);
-        glVertex2i(xres-b, 0+yres-b);
-        glVertex2i(xres,   0);
-        glVertex2i(xres-b, b);
-	
-        glVertex2i(0, 0);
+   void display_border(int xres, int yres)
+   {
+   int b = 50;
+   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+   glEnable(GL_BLEND);
+   glColor4f(1.0f, 1.0f, 0.0f, 0.5f);
+   glPushMatrix();
+   glBegin(GL_TRIANGLE_STRIP);
+   glVertex2i(0,      0);
+   glVertex2i(0+b,    0+b);
+   glVertex2i(0,      0+yres);
+   glVertex2i(0+b,    0+yres-b);
+   glVertex2i(xres,   0+yres);
+   glVertex2i(xres-b, 0+yres-b);
+   glVertex2i(xres,   0);
+   glVertex2i(xres-b, b);
 
-        glVertex2i(0+b,     0+b);
-    glEnd();
-    glPopMatrix();
-    glDisable(GL_BLEND);
+   glVertex2i(0, 0);
 
-}
-*/
+   glVertex2i(0+b,     0+b);
+   glEnd();
+   glPopMatrix();
+   glDisable(GL_BLEND);
+
+   }
+   */
 void display_credits(int xres, int yres) 
 {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -54,25 +55,25 @@ void display_credits(int xres, int yres)
     glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
     glPushMatrix();
     glBegin(GL_QUADS);
-        glVertex2i(0,      0);
-        glVertex2i(0,      0+yres);
-        glVertex2i(xres,   0+yres);
-        glVertex2i(xres,   0);
-	
+    glVertex2i(0,      0);
+    glVertex2i(0,      0+yres);
+    glVertex2i(xres,   0+yres);
+    glVertex2i(xres,   0);
+
 
     glEnd();
     glPopMatrix();
     glDisable(GL_BLEND);
 
-  Rect r;
-  r.bot = yres * 2 / 3;
-  r.left = xres / 2;
-  r.center = 100;
-  ggprint16(&r, 16, 0x00ffff00, "CREDITS:");
-  ggprint8b(&r, 16, 0x00ffff00, "Cameron McDaniel");
-  ggprint8b(&r, 16, 0x00ffff00, "Conner Estes");
-  ggprint8b(&r, 16, 0x00ffff00, "Jesus Baltazar");
-  ggprint8b(&r, 16, 0x00ffff00, "Mario Jimenez");
+    Rect r;
+    r.bot = yres * 2 / 3;
+    r.left = xres / 2;
+    r.center = 100;
+    ggprint16(&r, 16, 0x00ffff00, "CREDITS:");
+    ggprint8b(&r, 16, 0x00ffff00, "Cameron McDaniel");
+    ggprint8b(&r, 16, 0x00ffff00, "Conner Estes");
+    ggprint8b(&r, 16, 0x00ffff00, "Jesus Baltazar");
+    ggprint8b(&r, 16, 0x00ffff00, "Mario Jimenez");
 
 }
 
@@ -88,4 +89,946 @@ int time_since_mouse_move(const bool get)
         time(&mouse_timer);
     }
     return time(NULL) - mouse_timer;
+}
+
+void renderLevel(Level lev, Global gl, double* camera) {
+    int tx = lev.tilesize[0];
+    int ty = lev.tilesize[1];
+    Flt dd = lev.ftsz[0];
+    Flt offy = lev.tile_base;
+    int ncols_to_render = gl.xres / lev.tilesize[0] + 2;
+    int col = (int)(camera[0] / dd);
+    col = col % lev.ncols;
+    //Partial tile offset must be determined here.
+    //The leftmost tile might be partially off-screen.
+    //cdd: camera position in terms of tiles.
+    Flt cdd = camera[0] / dd;
+    //flo: just the integer portion
+    Flt flo = floor(cdd);
+    //dec: just the decimal portion
+    Flt dec = (cdd - flo);
+    //offx: the offset to the left of the screen to start drawing tiles
+    Flt offx = -dec * dd;
+    //Log("gl.camera[0]: %lf   offx: %lf\n",gl.camera[0],offx);
+    for (int j=0; j<ncols_to_render; j++) {
+        int row = lev.nrows-1;
+        for (int i=0; i<lev.nrows; i++) {
+            if (lev.arr[row][col] == ' ') {
+                glColor3ub(75, 105, 47);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '.') {
+                glColor3ub(0, 0, 0);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '+') {
+                glColor3ub(138, 77, 66);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '@') {
+                glColor3ub(102, 57, 49);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '#') {
+                glColor3ub(84, 47, 41);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '$') {
+                glColor3ub(129, 92, 86);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '%') {
+                glColor3ub(156, 151, 48);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '&') {
+                glColor3ub(182, 176, 54);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '*') {
+                glColor3ub(164, 17, 17);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '=') {
+                glColor3ub(40, 56, 26);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '-') {
+                glColor3ub(22, 31, 14);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == ';') {
+                glColor3ub(91, 9, 9);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '>') {
+                glColor3ub(162, 163, 146);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == ',') {
+                glColor3ub(224, 225, 202);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '\'') {
+                glColor3ub(105, 106, 106);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == ')') {
+                glColor3ub(134, 134, 134);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '!') {
+                glColor3ub(63, 65, 65);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '~') {
+                glColor3ub(84, 86, 86);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '{') {
+                glColor3ub(50, 50, 50);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == ']') {
+                glColor3ub(88, 89, 89);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '^') {
+                glColor3ub(48, 48, 48);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '/') {
+                glColor3ub(171, 173, 157);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '(') {
+                glColor3ub(125, 125, 125);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '_') {
+                glColor3ub(73, 73, 73);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == ':') {
+                glColor3ub(251, 249, 222);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '<') {
+                glColor3ub(43, 43, 39);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '[') {
+                glColor3ub(255, 255, 255);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '}') {
+                glColor3ub(181, 193, 170);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '|') {
+                glColor3ub(225, 230, 220);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '1') {
+                glColor3ub(119, 121, 109);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '2') {
+                glColor3ub(137, 138, 124);
+                glPushMatrix();
+                glTranslated((Flt)j*dd+offx, (Flt)i*lev.ftsz[1]+offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i( 0,  0);
+                glVertex2i( 0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx,  0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '3') {
+                glColor3ub(220, 220, 220);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '4') {
+                glColor3ub(203, 203, 185);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '5') {
+                glColor3ub(117, 117, 117);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '6') {
+                glColor3ub(184, 185, 166);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '7') {
+                glColor3ub(98, 98, 98);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '8') {
+                glColor3ub(147, 147, 147);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '9') {
+                glColor3ub(78, 186, 165);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == '0') {
+                glColor3ub(182, 182, 182);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'a') {
+                glColor3ub(143, 90, 36);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'b') {
+                glColor3ub(186, 134, 80);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'c') {
+                glColor3ub(39, 39, 39);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'd') {
+                glColor3ub(21, 61, 52);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'e') {
+                glColor3ub(21, 21, 21);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'f') {
+                glColor3ub(56, 56, 56);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'g') {
+                glColor3ub(95, 95, 95);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'h') {
+                glColor3ub(151, 151, 151);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'i') {
+                glColor3ub(213, 213, 213);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'j') {
+                glColor3ub(36, 95, 83);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'k') {
+                glColor3ub(180, 180, 180);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'l') {
+                glColor3ub(120, 120, 108);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'm') {
+                glColor3ub(65, 65, 65);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'n') {
+                glColor3ub(59, 143, 127);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'o') {
+                glColor3ub(242, 242, 233);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'p') {
+                glColor3ub(249, 250, 246);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'q') {
+                glColor3ub(112, 63, 54);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'r') {
+                glColor3ub(23, 23, 21);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 's') {
+                glColor3ub(147, 105, 62);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 't') {
+                glColor3ub(74, 42, 36);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'u') {
+                glColor3ub(60, 34, 29);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'v') {
+                glColor3ub(160, 86, 73);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'w') {
+                glColor3ub(134, 133, 119);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'x') {
+                glColor3ub(141, 142, 129);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'y') {
+                glColor3ub(207, 207, 207);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'z') {
+                glColor3ub(26, 26, 26);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'A') {
+                glColor3ub(233, 233, 233);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'B') {
+                glColor3ub(78, 60, 42);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'C') {
+                glColor3ub(111, 111, 111);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'D') {
+                glColor3ub(134, 104, 73);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'E') {
+                glColor3ub(36, 36, 32);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'F') {
+                glColor3ub(64, 64, 60);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'G') {
+                glColor3ub(121, 94, 66);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'H') {
+                glColor3ub(78, 78, 73);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'I') {
+                glColor3ub(147, 115, 82);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'J') {
+                glColor3ub(14, 14, 14);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            if (lev.arr[row][col] == 'K') {
+                glColor3ub(60, 60, 60);
+                glPushMatrix();
+                glTranslated((Flt)j * dd + offx, (Flt)i * lev.ftsz[1] + offy, 0);
+                glBegin(GL_QUADS);
+                glVertex2i(0, 0);
+                glVertex2i(0, ty);
+                glVertex2i(tx, ty);
+                glVertex2i(tx, 0);
+                glEnd();
+                glPopMatrix();
+            }
+            --row;
+        }
+        col = (col+1) % lev.ncols;
+    }
+    glColor3f(1.0, 1.0, 0.1);
+    glPushMatrix();
 }
