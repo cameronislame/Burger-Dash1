@@ -1,3 +1,9 @@
+/**
+ * Author: Cameron McDaniel, Mario Jimenez, Conner Estes, Jesus Baltazar Robles
+ * Created: 09/27/2023
+ * File: burger_dash.cpp
+ * Description: Main Game Source File 
+ **/
 #include <iostream>
 #include <stdio.h>
 #include <unistd.h>
@@ -10,6 +16,7 @@
 #include <GL/glx.h>
 //#include "log.h"
 #include "fonts.h"
+#include "X11_wrapper.h"
 #include "cmcdaniel.h"
 #include "cestes.h"
 #include "mjimenez.h"
@@ -29,7 +36,7 @@ double camera[2] = {0.0,0.0};
 
 //set up timers
 
-const double physicsRate = 1.0/18.0;
+const double physicsRate = 1.0/5.0;
 extern struct timespec timeStart, timeCurrent;
 extern struct timespec timePause;
 extern double physicsCountdown;
@@ -92,26 +99,6 @@ class Obstacle {
 
 //Square burger;
 
-
-
-
-class X11_wrapper {
-    private:
-        Display *dpy;
-        Window win;
-        GLXContext glc;
-    public:
-        ~X11_wrapper();
-        X11_wrapper();
-        void set_title();
-        bool getXPending();
-        XEvent getXNextEvent();
-        void swapBuffers();
-        void reshape_window(int width, int height);
-        void check_resize(XEvent *e);
-        void check_mouse(XEvent *e);
-        int check_keys(XEvent *e);
-} x11;
 //Declare global Level class
 Level lev;
 //Function prototypes
@@ -119,45 +106,8 @@ void init_opengl(void);
 void physics(void);
 void render(void);
 
-void renderStartScreen() {
-    glClear(GL_COLOR_BUFFER_BIT);
-    // Calculate the center of the screen
-    int centerX = gl.xres / 2;
-    int centerY = gl.yres / 2;
-    // Calculate the position of the yellow square relative to the center
-    int squareWidth = 300; // Increase the size as needed
-    int squareHeight = 300;
-    int squareX = centerX - (squareWidth / 2);
-    int squareY = centerY - (squareHeight / 2);
-    // Draw the larger yellow square in the center
-    glColor3ub(255, 255, 0); // Yellow color
-    glPushMatrix();
-    glTranslatef(squareX, squareY, 0.0f);
-    glBegin(GL_QUADS);
-    glVertex2f(0, 0);
-    glVertex2f(0, squareHeight);
-    glVertex2f(squareWidth, squareHeight);
-    glVertex2f(squareWidth, 0);
-    glEnd();
-    glPopMatrix();
-
-    unsigned int c = 0xf0f000ff; // Color
-    Rect r;
-    r.bot = squareY + (squareHeight / 2); // Center vertically
-    r.left = squareX + (squareWidth / 2); // Center horizontally
-    r.center = 1;
-    ggprint8b(&r, 64, c, "Burger Dash");
-
-    r.bot = squareY - 20;
-    r.left = centerX;
-    r.center = 1;
-    ggprint8b(&r, 16, c, "Press Enter to Start");
-
-    x11.swapBuffers();
-}
-
-void waitForEnterKey() {
-    XEvent e;
+void waitForEnterKey(X11_wrapper &x11) {
+    // XEvent e;
     while (startScreenActive) {
         while (x11.getXPending()) {
             XEvent e = x11.getXNextEvent();
@@ -174,17 +124,17 @@ void waitForEnterKey() {
 
 //extern bool CheckCollision2(Square burger, Enemy enemy) ;
 
-
 //=====================================
 // MAIN FUNCTION IS HERE
 //=====================================
 
 int main() {
+    X11_wrapper x11;
+    init_opengl();
+    renderStartScreen(gl.xres, gl.yres, x11, gl); // Display start screen
+    waitForEnterKey(x11);;   // Wait for Enter 
     clock_gettime(CLOCK_REALTIME, &timePause);
     clock_gettime(CLOCK_REALTIME, &timeStart);
-    init_opengl();
-    renderStartScreen(); // Display the start screen.
-    waitForEnterKey();   // Wait for Enter 
     //Main loop
     int done = 0;
     while (!done) {
@@ -208,9 +158,6 @@ int main() {
         render();
         x11.swapBuffers();
         //usleep(1000);
-
-         
-
 
 
         if (!startScreenActive) {
