@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstring>
 #include <cstdio>
+#include <string>
 /**
  * Auhtor: Jesus Baltazar Robles
  * Date: 9/29/2023
@@ -17,8 +18,9 @@ Level::Level() {
     ftsz[0] = (Flt)tilesize[0];
     ftsz[1] = (Flt)tilesize[1];
     tile_base = 0.0;
+    imageName = "final-kitchen.xpm";
     //read level
-    FILE *fpi = fopen("final-kitchen.xpm","r");
+    FILE *fpi = fopen(imageName.c_str(), "r");
     if (fpi) {
         nrows=0;
         char line[1000];
@@ -35,13 +37,43 @@ Level::Level() {
         fclose(fpi);
         //printf("nrows of background data: %i\n", nrows);
     }
+    /*
     for (int i=0; i<nrows; i++) {
         for (int j=0; j<ncols; j++) {
             printf("%c", arr[i][j]);
         }
         printf("\n");
+    } */
+}
+
+Level::Level(int tileSizeX, int tileSizeY, std::string fileName) {
+    
+    tilesize[0] = tileSizeX;
+    tilesize[1] = tileSizeY;
+    ftsz[0] = (Flt)tilesize[0];
+    ftsz[1] = (Flt)tilesize[1];
+    tile_base = 0.0;
+    imageName = fileName;
+    //read level
+    FILE *fpi = fopen(imageName.c_str(), "r");
+    if (fpi) {
+        nrows=0;
+        char line[20];
+        while (fgets(line, 20, fpi) != NULL) {
+            removeCrLf(line);
+            int slen = strlen(line);
+            ncols = slen;
+            //Log("line: %s\n", line);
+            for (int j=0; j<slen; j++) {
+                burgerArr[nrows][j] = line[j];
+            }
+            ++nrows;
+        }
+        fclose(fpi);
+        //printf("nrows of background data: %i\n", nrows);
     }
 }
+
 void Level::removeCrLf(char *str) {
     //remove carriage return and linefeed from a Cstring
     char *p = str;

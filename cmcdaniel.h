@@ -3,6 +3,7 @@
 #include <time.h>
 #include <math.h>
 #include "jbaltazarrob.h"
+#include "cestes.h"
 //Cameron's project files
 
 extern class Global {
@@ -37,7 +38,8 @@ extern void display_credits(int xres, int yres);
 extern int total_running_time(time_t begin);
 extern int time_since_mouse_move(const bool get);
 extern void renderLevel(Level lev, Global gl, double* camera);
-
+extern void renderBurger(Square burger, Level lev,  Global gl);
+extern void renderSquare(Square burger, int j, int i, Flt dd, Flt offy, int tx, int ty);
 class cameron{
 	int abc;
 };

@@ -2,16 +2,6 @@
 
 
 // cestes.h
-#ifndef CESTES_H
-#define CESTES_H
-
-
-
-
-
-#endif
-
-
 #ifndef _CESTES_H_
 #define _CESTES_H_
 
@@ -56,7 +46,6 @@ extern Enemy enemy;
 
 // ... other declarations ...
 
-#endif // _CESTES_H_
 
 class Health {
     public:
@@ -96,8 +85,8 @@ class Square {
         void init() {
             vel[0] = 0.0f;
             vel[1] = 0;
-            width =  15.0f;
-            height = 15.0f;
+            width =  5.0f;
+            height = 5.0f;
             pos[0] = 500.0f;
             pos[1] = 0.0f + height;
         }
@@ -117,3 +106,5 @@ void renderEnemy();
 extern void display_name(int, int);
 void renderHealth();
 bool Check2(Square burger, Enemy enemy);
+
+#endif

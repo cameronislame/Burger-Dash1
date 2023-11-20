@@ -8,6 +8,7 @@
 #include "fonts.h"
 #include "cmcdaniel.h"
 #include "jbaltazarrob.h"
+#include <iostream>
 #include <GL/glx.h>
 #include <time.h>
 
@@ -90,6 +91,80 @@ int time_since_mouse_move(const bool get)
     }
     return time(NULL) - mouse_timer;
 }
+
+void renderBurger(Square burger, Level lev, Global gl) {
+    int tx = lev.tilesize[0];
+    int ty = lev.tilesize[1];
+    Flt dd = lev.ftsz[0];
+    Flt offy = lev.tile_base;
+
+    for (int j = 0; j < lev.ncols; j++) {
+        for (int i = 0; i < lev.nrows; i++) {
+            int row = lev.nrows - 1 - i; // Invert row index
+            int col = j;
+
+            if (lev.burgerArr[row][col] == '.') {
+                glColor3ub(0, 0, 0);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.burgerArr[row][col] == '+') {
+                glColor3ub(165,112,58);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.burgerArr[row][col] == '@') {
+                glColor3ub(186,134,80);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.burgerArr[row][col] == '#') {
+                glColor3ub(212,208,137);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.burgerArr[row][col] == '$') {
+                glColor3ub(182,176,54);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.burgerArr[row][col] == '%') {
+                glColor3ub(143,90,36);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.burgerArr[row][col] == '&') {
+                glColor3ub(203,55,55);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.burgerArr[row][col] == '*') {
+                glColor3ub(172,50,50);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.burgerArr[row][col] == '=') {
+                glColor3ub(95,55,36);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.burgerArr[row][col] == '-') {
+                glColor3ub(78,134,40);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.burgerArr[row][col] == ';') {
+                glColor3ub(103,177,52);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+        }
+    }
+}
+
+
+void renderSquare(Square burger, int j, int i, Flt dd, Flt offy, int tx, int ty) {
+    glPushMatrix();
+    glTranslated((Flt)j * dd + burger.pos[0], (Flt)i * ty + offy + burger.pos[1], 0);
+    glBegin(GL_QUADS);
+    glVertex2f(-burger.width / 2.0, -burger.height / 2.0);  // Adjusted for centering
+    glVertex2f(-burger.width / 2.0, burger.height / 2.0);
+    glVertex2f(burger.width / 2.0, burger.height / 2.0);
+    glVertex2f(burger.width / 2.0, -burger.height / 2.0);
+    glEnd();
+    glPopMatrix();
+}
+
+
 
 void renderLevel(Level lev, Global gl, double* camera) {
     int tx = lev.tilesize[0];
