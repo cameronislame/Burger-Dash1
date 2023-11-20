@@ -101,6 +101,7 @@ class Obstacle {
 
 //Declare global Level class
 Level lev;
+Level burgerSprite(5.0f, 5.0f, "burger.xpm");
 //Function prototypes
 void init_opengl(void);
 void physics(void);
@@ -491,18 +492,7 @@ void render()
     
     renderHealth();
     renderLevel(lev, gl, camera);
-
-    //render burger
-    glPushMatrix();
-    glColor3ub(250,250,250);
-    glTranslatef(burger.pos[0], burger.pos[1], 0.0f);
-    glBegin(GL_QUADS);
-    glVertex2f(-burger.width, -burger.height);
-    glVertex2f(-burger.width,  burger.height);
-    glVertex2f( burger.width,  burger.height);
-    glVertex2f( burger.width, -burger.height);
-    glEnd();
-    glPopMatrix();
+    renderBurger(burger, burgerSprite, gl);
     
     renderEnemy();    
 
