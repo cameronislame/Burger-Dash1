@@ -114,7 +114,7 @@ void renderEnemy() {
 }
 
 
-const double physicsRate = 1.0 / 120.0;
+const double physicsRate = 1.0 / 10.0;
 const double oobillion = 1.0 / 1e9;
 struct timespec timeStart, timeCurrent;
 struct timespec timePause;

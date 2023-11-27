@@ -36,7 +36,7 @@ double camera[2] = {0.0,0.0};
 
 //set up timers
 
-const double physicsRate = 1.0/18.0;
+const double physicsRate = 1.0/10.0;
 extern struct timespec timeStart, timeCurrent;
 extern struct timespec timePause;
 extern double physicsCountdown;
@@ -434,12 +434,16 @@ void physics()
 
     }*/
 
-    if (enemy.pos[0] >= 600.0f) {
-        enemy.vel[0] = -12.0;
+    if (enemy.pos[0] + enemy.width < 0) {
+        enemy.init();
 
     }
 
-  
+     if (spike.pos[0] + spike.width < 0) {
+        spike.init();
+
+    }
+ 
 
 
     if(Check2(burger,enemy)){
@@ -447,6 +451,9 @@ void physics()
         
 
     }
+
+
+
 
     for(int i = 0; i<50; i++){
         //render the level while burger is in motion
