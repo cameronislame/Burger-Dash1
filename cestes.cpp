@@ -11,6 +11,7 @@
 #include <cstring>
 #include <unistd.h>
 /*
+
 void display_border(int xres, int yres)
 {
     //draw border around window
@@ -55,6 +56,34 @@ void display_name (int x , int y)
 
 Enemy enemy;  // Definition of the enemy variable
 
+bool Check3(Square burger, Oil oil) {
+    int leftBurger = burger.pos[0] - burger.width;
+    int rightBurger = burger.pos[0] + burger.width;
+    int topBurger = burger.pos[1] - burger.height;
+    int bottomBurger = burger.pos[1] + burger.height;
+
+    int leftOil = oil.pos[0] - oil.width;
+    int rightOil = oil.pos[0] + oil.width;
+    int topOil = oil.pos[1] - oil.height;
+    int bottomOil = oil.pos[1] + oil.height;
+
+    if (rightBurger < leftOil || rightOil < leftBurger)
+        return false;
+
+    if (bottomBurger < topOil || bottomOil < topBurger)
+        return false;
+
+
+    // If there is a collision, set burger's velocity to 0
+
+    return true;
+
+
+
+
+}
+
+
 // Definition of the collision detection function
 bool Check2(Square burger, Enemy enemy) {
     bool enemyCollisionOccurred = false;
@@ -92,7 +121,9 @@ void renderEnemy() {
     glVertex2f(enemy.width, -enemy.height);
     glEnd();
     glPopMatrix();
-}int total_physics_function_calls(){
+}
+
+int total_physics_function_calls(){
     static int firsttime = 1;
     static int physics_count;
     if (firsttime){
@@ -166,6 +197,45 @@ void renderHealth() {
 
 
 
+}
+
+
+Oil oil;
+
+void renderOil(){
+
+    glPushMatrix();
+    glColor3ub(0,255, 0);  // Green color
+    glTranslatef(oil.pos[0], oil.pos[1], 0.0f);
+    glBegin(GL_QUADS);
+    glVertex2f(-oil.width, -oil.height);
+    glVertex2f(-oil.width, oil.height);
+    glVertex2f(oil.width, oil.height);
+    glVertex2f(oil.width, -oil.height);
+    glEnd();
+    glPopMatrix();
+
+}
+
+void renderGameOver( int xres, int yres, X11_wrapper& x11, Global& gl) {
+    glClear(GL_COLOR_BUFFER_BIT);
+    unsigned int c = 0x00ffff44;
+    // Render game over message and any other elements of the game over screen.
+    // You can use glColor3ub, glPushMatrix, glBegin, glEnd, and other OpenGL functions
+    // to draw text and graphics for the game over screen.
+    // For example:
+    glColor3ub(255, 0, 0); // Red color
+    // Position and draw your game over message.
+    // Example:
+    Rect gameOverText;
+    gameOverText.bot = yres / 2;
+    gameOverText.left = xres / 2;
+    gameOverText.center = 1;
+    ggprint8b(&gameOverText, 16, c, "Game Over");
+
+    // Render any other game over elements as needed.
+
+    x11.swapBuffers();
 }
 
 

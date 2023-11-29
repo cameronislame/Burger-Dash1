@@ -26,7 +26,8 @@
 
 using namespace std;
 bool startScreenActive = true;
-
+bool gameOver = false;
+bool restart = false;
 //floating point random numbers
 #define rnd() (float)rand() / (float)RAND_MAX
 
@@ -150,27 +151,50 @@ int main() {
         timeSpan = timeDiff(&timeStart, &timeCurrent);
         timeCopy(&timeStart, &timeCurrent);
         physicsCountdown += timeSpan;
-        while (physicsCountdown >= physicsRate) {
-            physics();
-            physicsCountdown -= physicsRate;
-            render();
-            
-        }
-        render();
         x11.swapBuffers();
         //usleep(1000);
 
 
+
+
         if (!startScreenActive) {
+            if (!gameOver){
+             while (physicsCountdown >= physicsRate) {
             physics();
+            physicsCountdown -= physicsRate;
+
+        }
             render();
-            //renderHealth();
-            //renderEnemy();
-            //CheckCollision2();
+            }
+            if (gameOver) {
+                renderGameOver(gl.xres,gl.yres,x11,gl);
+                usleep(1000000); 
+                gameOver = false;
+                burger.init();
+                spike.init();
+                enemy.init();
+                healthbar.init();
+                oil.init();
+                
+
+
+            }
+
+           
+
+            
+            
+            
             x11.swapBuffers();
             usleep(400);
+            }
         }
-    }
+        
+       
+
+
+        
+    
     return 0;
 }
 
@@ -321,6 +345,7 @@ int X11_wrapper::check_keys(XEvent *e)
                 spike.init();
                 enemy.init();
                 healthbar.init();
+                oil.init();
                 break;
             case XK_Escape:
                 //Escape key was pressed
@@ -393,6 +418,7 @@ void physics()
     spike.pos[0] += spike.vel[0];
 
     enemy.pos[0] += enemy.vel[0];
+    oil.pos[0] += oil.vel[0];
 
     // burger physics
     // If burger is off the ground, it is subject to gravity
@@ -481,9 +507,16 @@ void physics()
         enemyCollisionOccurred  = 1;
         if (healthbar.health <= 0) {
             healthbar.health = 0;
+            gameOver = true;
+            
         }
 
       }
+
+
+    if (Check3(burger,oil)) {
+        burger.vel[1] = -20.0;
+    }
 }
 
 
@@ -502,7 +535,7 @@ void render()
     renderBurger(burger, burgerSprite, gl);
     
     renderEnemy();    
-
+    renderOil();
 
     //draw spike
     glPushMatrix();
@@ -528,6 +561,12 @@ void render()
     ggprint8b(&r, 16, c, "Press C for credits");
     ggprint8b(&r, 16, c, "Press S for statistics");
     ggprint8b(&r, 16, c, "score: %i", gl.score);
+
+    if (gameOver) {
+        
+
+    }
+
 
     if (gl.show_border) {
         display_border(gl.xres, gl.yres);

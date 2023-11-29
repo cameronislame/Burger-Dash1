@@ -1,27 +1,33 @@
 // Conner Estes header file
 
+#include <time.h>
+#include "X11_wrapper.h"
 
 // cestes.h
 #ifndef _CESTES_H_
 #define _CESTES_H_
+class Global;
 
-class Stove {
+
+
+class Oil {
     public:
         float pos[2];
         float vel[2];
         float width;
         float height;
-        Stove(){
+        Oil(){
             init();
         }
         void init(){
             width = 30.0f;
             height = 3.0f;
             pos[0] = 1000.0f;
+            vel[0] = -5.0f;
         }
 };
 
-
+extern Oil oil;
 
 
 class Enemy {
@@ -39,6 +45,7 @@ public:
         pos[0] = 1000.0f;
         pos[1] = 0.0f + height;
         vel[0] = -12.0f;
+        //pos[0] += vel[0];
     }
 };
 
@@ -106,5 +113,7 @@ void renderEnemy();
 extern void display_name(int, int);
 void renderHealth();
 bool Check2(Square burger, Enemy enemy);
-
+void renderOil();
+bool Check3(Square burger,Oil oil);
+void renderGameOver( int xres, int yres, X11_wrapper& x11, Global& gl);
 #endif
