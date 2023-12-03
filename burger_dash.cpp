@@ -123,7 +123,28 @@ void waitForEnterKey(X11_wrapper &x11) {
         }
     }
 }
+void initObj()
+{
+    //initialize knives in the air
+    knife1.pos[0] = gl.xres + knife1.width;
+    knife1.pos[1] = gl.yres / 4.0;
+    knife1.width = 20.0;
+    knife1.vel[0] = -40;
+    knife1.height = 4.0;
 
+
+    knife2.pos[0] = gl.xres + knife2.width + 20.0;
+    knife2.pos[1] = (gl.yres / 4.0) + 20.0;
+    knife2.width = 20.0;
+    knife2.vel[0] = -40;
+    knife2.height = 4.0;
+
+    knife3.pos[0] = gl.xres + knife3.width + 20;
+    knife3.pos[1] = (gl.yres / 4.0) - 20.0;
+    knife3.width = 20.0;
+    knife3.vel[0] = -40;
+    knife3.height = 4.0;
+}
 //extern bool CheckCollision2(Square burger, Enemy enemy) ;
 
 //=====================================
@@ -137,6 +158,9 @@ int main() {
     waitForEnterKey(x11);;   // Wait for Enter 
     clock_gettime(CLOCK_REALTIME, &timePause);
     clock_gettime(CLOCK_REALTIME, &timeStart);
+    // Render knife and hp pack
+    init_hpPack();
+    initObj();
     //Main loop
     int done = 0;
     while (!done) {
@@ -175,7 +199,8 @@ int main() {
                 enemy.init();
                 healthbar.init();
                 oil.init();
-                
+                initObj();//knife initializer
+                init_hpPack();
 
 
             }
@@ -346,6 +371,8 @@ int X11_wrapper::check_keys(XEvent *e)
                 enemy.init();
                 healthbar.init();
                 oil.init();
+                initObj();//knife intializer
+                init_hpPack();
                 break;
             case XK_Escape:
                 //Escape key was pressed
@@ -420,6 +447,29 @@ void physics()
     enemy.pos[0] += enemy.vel[0];
     oil.pos[0] += oil.vel[0];
 
+     //hp pack physics
+    hp_pack.pos[0] += hp_pack.vel[0];
+    if (hp_pack.pos[0] + hp_pack.width < 0.0) {
+        init_hpPack();
+    }
+    // knife physics
+    knife1.pos[0] += knife1.vel[0];
+    knife2.pos[0] += knife2.vel[0];
+    knife3.pos[0] += knife3.vel[0];
+    //knife collision
+    if(checkCollision(burger, knife1) || checkCollision(burger, knife2) ||
+            checkCollision(burger, knife3)) {
+        healthbar.health += -5;
+     }
+    if (knife1.pos[0] + knife1.width < 0.0) {
+        initObj();
+    }
+    if (knife2.pos[0] + knife2.width < 0.0) {
+        initObj();
+    }
+    if (knife3.pos[0] + knife3.width < 0.0) {
+        initObj();
+    }
     // burger physics
     // If burger is off the ground, it is subject to gravity
     if(burger.pos[1] > 0 + burger.height && !checkCollision(burger, spike)) {
@@ -546,6 +596,51 @@ void render()
     glVertex2f(-spike.width,  spike.height);
     glVertex2f( spike.width,  spike.height);
     glVertex2f( spike.width, -spike.height);
+    glEnd();
+    glPopMatrix();
+    //Knives in the air
+    glPushMatrix();
+    glColor3ub(160,32,240);
+    glTranslatef(knife1.pos[0], knife1.pos[1], 0.0f);
+    glBegin(GL_QUADS);
+    glVertex2f(-knife1.width, -knife1.height);
+    glVertex2f(-knife1.width,  knife1.height);
+    glVertex2f( knife1.width,  knife1.height);
+    glVertex2f( knife1.width, -knife1.height);
+    glEnd();
+    glPopMatrix();
+
+
+    glPushMatrix();
+    glColor3ub(160,32,240);
+    glTranslatef(knife2.pos[0], knife2.pos[1], 0.0f);
+    glBegin(GL_QUADS);
+    glVertex2f(-knife2.width, -knife2.height);
+    glVertex2f(-knife2.width,  knife2.height);
+    glVertex2f( knife2.width,  knife2.height);
+    glVertex2f( knife2.width, -knife2.height);
+    glEnd();
+    glPopMatrix();
+
+    glPushMatrix();
+    glColor3ub(160,32,240);
+    glTranslatef(knife3.pos[0], knife3.pos[1], 0.0f);
+    glBegin(GL_QUADS);
+    glVertex2f(-knife3.width, -knife3.height);
+    glVertex2f(-knife3.width,  knife3.height);
+    glVertex2f( knife3.width,  knife3.height);
+    glVertex2f( knife3.width, -knife3.height);
+    glEnd();
+    glPopMatrix();
+    //render hp pack in the air
+    glPushMatrix();
+    glColor3ub(0,255,0);
+    glTranslatef(hp_pack.pos[0], hp_pack.pos[1], 0.0f);
+    glBegin(GL_QUADS);
+    glVertex2f(-hp_pack.width, -hp_pack.height);
+    glVertex2f(-hp_pack.width,  hp_pack.height);
+    glVertex2f( hp_pack.width,  hp_pack.height);
+    glVertex2f( hp_pack.width, -hp_pack.height);
     glEnd();
     glPopMatrix();
     
