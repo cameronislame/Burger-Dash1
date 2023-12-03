@@ -1,6 +1,7 @@
 #ifndef _JESUS_H_
 #define _JESUS_H_
 #include <string>
+#include "cestes.h"
 /**
  * Author:    Jesus Baltazar Robles
  * Created:   9/29/2023
@@ -22,6 +23,9 @@ class Level {
     Level(int tileSizeX, int tileSizeY, std::string fileName);
     void removeCrLf(char *str);
 };
+//Create health powerup
+extern Square hp_pack;
+void init_hpPack();
 void render_calls();
 float total_render_function_calls();
 #endif

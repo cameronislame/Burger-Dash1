@@ -11,6 +11,7 @@
 /*LEVEL CLASS INITIALIZATION
  * CODE COMES FROM GORDON WALK2*/
 float render_val_count = 0;
+Square hp_pack;
 Level::Level() {
     //Log("Level constructor\n");
     tilesize[0] = 8;
@@ -90,4 +91,13 @@ void render_calls(){
 }
 float total_render_function_calls(){
     return render_val_count;
+}
+void init_hpPack()
+{
+    hp_pack.pos[0] = 1500.0;
+    hp_pack.pos[1] = 200;
+    hp_pack.width = 20.0;
+    hp_pack.vel[0] = -50;
+    hp_pack.height = 20.0;
+
 }
