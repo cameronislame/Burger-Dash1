@@ -127,7 +127,7 @@ void render(void);
 
 void waitForEnterKey(X11_wrapper &x11) {
     // XEvent e;
-    if (!playOpenALSound("./607276__bloodpixelhero__retro-arcade-music-2.wav")) {
+    if (!playOpenALSound("./251461__joshuaempyre__arcade-music-loop.wav")) {
         printf("Failed to play sound.\n");
     }
     while (startScreenActive) { 
@@ -137,7 +137,7 @@ void waitForEnterKey(X11_wrapper &x11) {
                 int key = XLookupKeysym(&e.xkey, 0);
                 if (key == XK_Return) {
                     startScreenActive = false;
-		    stopOpenALSound();
+		            //stopOpenALSound();
                     break;
                 }
             }
