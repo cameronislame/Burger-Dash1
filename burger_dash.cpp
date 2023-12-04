@@ -468,7 +468,7 @@ bool checkCollision(Square burger, Square spike) {
 
 void physics()
 {
-    bool enemyCollisionOccurred = false;
+    
     //int tries;
 
     // shield power-up physics
@@ -600,9 +600,9 @@ void physics()
 
 
 
-    if ((checkCollision(burger, spike)) || ((Check2(burger, enemy))) && !enemyCollisionOccurred ) {
+    if ((checkCollision(burger, spike)) || ((Check2(burger, enemy)))) {
         healthbar.health = healthbar.health - 20;  // Adjust the amount based on your game's design
-        enemyCollisionOccurred  = 1;
+        
         if (healthbar.health <= 0) {
             healthbar.health = 0;
             gameOver = true;

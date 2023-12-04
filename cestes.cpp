@@ -93,7 +93,6 @@ bool Check3(Square burger, Oil oil) {
 
 // Definition of the collision detection function
 bool Check2(Square burger, Enemy enemy) {
-    bool enemyCollisionOccurred = false;
     int leftBurger = burger.pos[0] - burger.width;
     int rightBurger = burger.pos[0] + burger.width;
     int topBurger = burger.pos[1] - burger.height;
