@@ -5,7 +5,7 @@
 /**
  * Author:    Jesus Baltazar Robles
  * Created:   9/29/2023
- * 
+ *
  **/
 /*Header files that will define level design and objects implementation*/
 typedef double Flt;
@@ -25,7 +25,16 @@ class Level {
 };
 //Create health powerup
 extern Square hp_pack;
+//Knife obj
+extern Square knife1;
+extern Square knife2;
+extern Square knife3;
+
+
+void initKnives();
 void init_hpPack();
+void render_knives();
+void render_hp_pack();
 void render_calls();
 float total_render_function_calls();
 #endif
