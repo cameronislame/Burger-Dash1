@@ -460,7 +460,32 @@ bool checkCollision(Square burger, Obstacle spike) {
     return true;
 
 }
+bool checkCollision(Square burger, Square spike) {
 
+
+
+    // Calculate the coordinates of the bounding boxes
+    int leftBurger = burger.pos[0] - burger.width;
+    int rightBurger = burger.pos[0] + burger.width;
+    int topBurger = burger.pos[1] - burger.height;
+    int bottomBurger = burger.pos[1] + burger.height;
+
+    int leftSpike = spike.pos[0] - spike.width;
+    int rightSpike = spike.pos[0] + spike.width;
+    int topSpike = spike.pos[1] - spike.height;
+    int bottomSpike = spike.pos[1] + spike.height;
+
+    // If one shape is on the left side of the other
+    if (rightBurger < leftSpike || rightSpike < leftBurger)
+        return false;
+
+    // If one shape is above the other
+    if (bottomBurger < topSpike || bottomSpike < topBurger)
+        return false;
+
+    return true;
+
+}
 void physics()
 {
     bool enemyCollisionOccurred = false;
@@ -484,7 +509,7 @@ void physics()
     //knife collision
     if(checkCollision(burger, knife1) || checkCollision(burger, knife2) ||
             checkCollision(burger, knife3)) {
-        healthbar.health += -5;
+        healthbar.health += -20;
      }
     if (knife1.pos[0] + knife1.width < 0.0) {
         initObj();
@@ -623,51 +648,12 @@ void render()
     glVertex2f( spike.width, -spike.height);
     glEnd();
     glPopMatrix();
-    //Knives in the air
-    glPushMatrix();
-    glColor3ub(160,32,240);
-    glTranslatef(knife1.pos[0], knife1.pos[1], 0.0f);
-    glBegin(GL_QUADS);
-    glVertex2f(-knife1.width, -knife1.height);
-    glVertex2f(-knife1.width,  knife1.height);
-    glVertex2f( knife1.width,  knife1.height);
-    glVertex2f( knife1.width, -knife1.height);
-    glEnd();
-    glPopMatrix();
-
-
-    glPushMatrix();
-    glColor3ub(160,32,240);
-    glTranslatef(knife2.pos[0], knife2.pos[1], 0.0f);
-    glBegin(GL_QUADS);
-    glVertex2f(-knife2.width, -knife2.height);
-    glVertex2f(-knife2.width,  knife2.height);
-    glVertex2f( knife2.width,  knife2.height);
-    glVertex2f( knife2.width, -knife2.height);
-    glEnd();
-    glPopMatrix();
-
-    glPushMatrix();
-    glColor3ub(160,32,240);
-    glTranslatef(knife3.pos[0], knife3.pos[1], 0.0f);
-    glBegin(GL_QUADS);
-    glVertex2f(-knife3.width, -knife3.height);
-    glVertex2f(-knife3.width,  knife3.height);
-    glVertex2f( knife3.width,  knife3.height);
-    glVertex2f( knife3.width, -knife3.height);
-    glEnd();
-    glPopMatrix();
+    //Render knives
+    render_knives();
     //render hp pack in the air
-    glPushMatrix();
-    glColor3ub(0,255,0);
-    glTranslatef(hp_pack.pos[0], hp_pack.pos[1], 0.0f);
-    glBegin(GL_QUADS);
-    glVertex2f(-hp_pack.width, -hp_pack.height);
-    glVertex2f(-hp_pack.width,  hp_pack.height);
-    glVertex2f( hp_pack.width,  hp_pack.height);
-    glVertex2f( hp_pack.width, -hp_pack.height);
-    glEnd();
-    glPopMatrix();
+    if(healthbar.health < 170) {
+        render_hp_pack();
+    }
     
     unsigned int c = 0x00ffff44;
     Rect r;
