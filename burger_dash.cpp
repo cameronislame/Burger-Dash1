@@ -114,6 +114,7 @@ int hp_ST = 1;
 //Declare global Level class
 Level lev;
 Level burgerSprite(5.0f, 5.0f, "burger.xpm");
+ShieldPowerUp shieldPowerUp;
 //Function prototypes
 void init_opengl(void);
 void physics(void);
@@ -203,6 +204,7 @@ int main() {
                 oil.init();
                 initKnives();//knife initializer
                 init_hpPack();
+                shieldPowerUp.init();// Initialize shield power-up
 
 
             }
@@ -463,16 +465,25 @@ bool checkCollision(Square burger, Square spike) {
     return true;
 
 }
+
 void physics()
 {
     bool enemyCollisionOccurred = false;
     //int tries;
+
+    // shield power-up physics
+    shieldPowerUp.pos[0] += shieldPowerUp.vel[0];
 
     // spike physics
     spike.pos[0] += spike.vel[0];
 
     enemy.pos[0] += enemy.vel[0];
     oil.pos[0] += oil.vel[0];
+
+    // Check collision with shield power-up
+    if (Check4(burger, shieldPowerUp)) {
+        shieldPowerUp.activate();
+    }
 
      //hp pack physics
     hp_pack.pos[0] += hp_pack.vel[0];
@@ -484,12 +495,15 @@ void physics()
     knife2.pos[0] += knife2.vel[0];
     knife3.pos[0] += knife3.vel[0];
     //knife collision
-    if(checkCollision(burger, knife1) || checkCollision(burger, knife2) ||
-            checkCollision(burger, knife3)) {
-        healthbar.health += -20;
-        hp_ST = 0;
-        gl.score += 1;
-     }
+    if (!shieldPowerUp.isActivated()) {
+        // Only apply damage if the shield is not active
+        if (checkCollision(burger, knife1) || checkCollision(burger, knife2) || 
+                checkCollision(burger, knife3)) {
+            healthbar.health -= 20;
+            hp_ST = 0;
+            gl.score += 1;
+        }
+    }
     if (knife1.pos[0] + knife1.width < 0.0) {
         ST = 0;
         initKnives(); 
@@ -613,6 +627,20 @@ void render()
     
     renderEnemy();    
     renderOil();
+
+    // Render shield power-up
+    if (!shieldPowerUp.isActivated()) {
+        glColor3ub(50, 100, 200);
+        glPushMatrix();
+        glTranslatef(shieldPowerUp.pos[0], shieldPowerUp.pos[1], 0.0f);
+        glBegin(GL_QUADS);
+        glVertex2f(-shieldPowerUp.width, -shieldPowerUp.height);
+        glVertex2f(-shieldPowerUp.width, shieldPowerUp.height);
+        glVertex2f(shieldPowerUp.width, shieldPowerUp.height);
+        glVertex2f(shieldPowerUp.width, -shieldPowerUp.height);
+        glEnd();
+        glPopMatrix();
+    }
 
     //draw spike
     glPushMatrix();
