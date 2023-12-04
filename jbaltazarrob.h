@@ -33,8 +33,8 @@ extern Square knife3;
 
 void initKnives();
 void init_hpPack();
-void render_knives();
-void render_hp_pack();
+void render_knives(int state);
+void render_hp_pack(int state);
 void render_calls();
 float total_render_function_calls();
 #endif

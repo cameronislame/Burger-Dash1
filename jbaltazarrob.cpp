@@ -112,27 +112,28 @@ void init_hpPack()
 void initKnives()
 {
     //initialize knives in the air
-    knife1.pos[0] = gl.xres + knife1.width;
-    knife1.pos[1] = gl.yres / 4.0;
+    knife1.pos[0] = burger.pos[0] + gl.xres + knife1.width;
+    knife1.pos[1] = gl.yres / 3.0;
     knife1.width = 20.0;
     knife1.vel[0] = -40;
     knife1.height = 4.0;
 
 
-    knife2.pos[0] = gl.xres + knife2.width + 20.0;
-    knife2.pos[1] = (gl.yres / 4.0) + 40.0;
+    knife2.pos[0] = burger.pos[0] + gl.xres + knife2.width + 60.0;
+    knife2.pos[1] = (gl.yres / 3.0) + 50.0;
     knife2.width = 20.0;
     knife2.vel[0] = -40;
     knife2.height = 4.0;
 
-    knife3.pos[0] = gl.xres + knife3.width + 20;
-    knife3.pos[1] = (gl.yres / 4.0) - 40.0;
+    knife3.pos[0] = burger.pos[0] + gl.xres + knife3.width + 60.0;
+    knife3.pos[1] = (gl.yres / 3.0) - 50.0;
     knife3.width = 20.0;
     knife3.vel[0] = -40;
     knife3.height = 4.0;
 }
-void render_knives()
+void render_knives(int state)
 {
+    if(state == 1) {
     //Knives in the air
     glPushMatrix();
     glColor3ub(160,32,240);
@@ -167,11 +168,13 @@ void render_knives()
     glVertex2f( knife3.width, -knife3.height);
     glEnd();
     glPopMatrix();
+    }
+    
 }
-void render_hp_pack()
+void render_hp_pack(int state)
 {
     //render hp pack in the air
-    if(healthbar.health < 170) {
+    if(state) {
         glPushMatrix();
         glColor3ub(0,255,0);
         glTranslatef(hp_pack.pos[0], hp_pack.pos[1], 0.0f);

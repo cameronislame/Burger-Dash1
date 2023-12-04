@@ -106,7 +106,9 @@ class Obstacle {
         }
 } spike;
 
-
+// Render knives
+int ST = 1;
+int hp_ST = 1;
 //Square burger;
 
 //Declare global Level class
@@ -141,28 +143,6 @@ void waitForEnterKey(X11_wrapper &x11) {
         }
     }
 }
-void initObj()
-{
-    //initialize knives in the air
-    knife1.pos[0] = gl.xres + knife1.width;
-    knife1.pos[1] = gl.yres / 4.0;
-    knife1.width = 20.0;
-    knife1.vel[0] = -40;
-    knife1.height = 4.0;
-
-
-    knife2.pos[0] = gl.xres + knife2.width + 20.0;
-    knife2.pos[1] = (gl.yres / 4.0) + 20.0;
-    knife2.width = 20.0;
-    knife2.vel[0] = -40;
-    knife2.height = 4.0;
-
-    knife3.pos[0] = gl.xres + knife3.width + 20;
-    knife3.pos[1] = (gl.yres / 4.0) - 20.0;
-    knife3.width = 20.0;
-    knife3.vel[0] = -40;
-    knife3.height = 4.0;
-}
 //extern bool CheckCollision2(Square burger, Enemy enemy) ;
 
 //=====================================
@@ -179,7 +159,7 @@ int main() {
     clock_gettime(CLOCK_REALTIME, &timeStart);
     // Render knife and hp pack
     init_hpPack();
-    initObj();
+    initKnives();
     //Main loop
     int done = 0;
     while (!done) {
@@ -221,7 +201,7 @@ int main() {
                 enemy.init();
                 healthbar.init();
                 oil.init();
-                initObj();//knife initializer
+                initKnives();//knife initializer
                 init_hpPack();
 
 
@@ -393,7 +373,7 @@ int X11_wrapper::check_keys(XEvent *e)
                 enemy.init();
                 healthbar.init();
                 oil.init();
-                initObj();//knife intializer
+                initKnives();//knife intializer
                 init_hpPack();
                 break;
             case XK_Escape:
@@ -507,15 +487,12 @@ void physics()
     if(checkCollision(burger, knife1) || checkCollision(burger, knife2) ||
             checkCollision(burger, knife3)) {
         healthbar.health += -20;
+        hp_ST = 0;
+        gl.score += 1;
      }
     if (knife1.pos[0] + knife1.width < 0.0) {
-        initObj();
-    }
-    if (knife2.pos[0] + knife2.width < 0.0) {
-        initObj();
-    }
-    if (knife3.pos[0] + knife3.width < 0.0) {
-        initObj();
+        ST = 0;
+        initKnives(); 
     }
     // burger physics
     // If burger is off the ground, it is subject to gravity
@@ -594,6 +571,9 @@ void physics()
     if (burger.pos[0] - burger.width > spike.pos[0] + spike.width && !spike.pointClaimed) {
         spike.pointClaimed = true;
         gl.score += 1;
+        //re-Render knives when the user has an even amount of points
+        if(gl.score % 2 == 0)
+            ST = 1;
     }
 
 
@@ -646,10 +626,12 @@ void render()
     glEnd();
     glPopMatrix();
     //Render knives
-    render_knives();
+    render_knives(ST);
+    
     //render hp pack in the air
     if(healthbar.health < 170) {
-        render_hp_pack();
+        render_hp_pack(hp_ST);
+        hp_ST = 1;
     }
     
     unsigned int c = 0x00ffff44;
