@@ -106,10 +106,7 @@ class Obstacle {
         }
 } spike;
 
-//Knife obstacle
-Obstacle knife1;
-Obstacle knife2;
-Obstacle knife3;
+
 //Square burger;
 
 //Declare global Level class
