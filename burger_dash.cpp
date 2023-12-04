@@ -20,11 +20,20 @@
 #include "cmcdaniel.h"
 #include "cestes.h"
 #include "mjimenez.h"
-#include "jbaltazarrob.h" 
+#include "jbaltazarrob.h"
+#include <sys/stat.h>
+#include </usr/include/AL/alut.h>
+#include <thread>
+#include <string>
+
+
 //# Need to work on modified burger_dash on odin but don't want to make
 // changes to main yet, until discussed.
 
+
+
 using namespace std;
+bool loopMusic = true;
 bool startScreenActive = true;
 bool gameOver = false;
 bool restart = false;
@@ -36,7 +45,7 @@ const float GRAVITY = 1.0f;
 double camera[2] = {0.0,0.0};
 
 //set up timers
-
+extern void startScreenMusic();
 const double physicsRate = 1.0/10.0;
 extern struct timespec timeStart, timeCurrent;
 extern struct timespec timePause;
@@ -111,15 +120,24 @@ void init_opengl(void);
 void physics(void);
 void render(void);
 
+
+
+
+
+
 void waitForEnterKey(X11_wrapper &x11) {
     // XEvent e;
-    while (startScreenActive) {
+    if (!playOpenALSound("./607276__bloodpixelhero__retro-arcade-music-2.wav")) {
+        printf("Failed to play sound.\n");
+    }
+    while (startScreenActive) { 
         while (x11.getXPending()) {
             XEvent e = x11.getXNextEvent();
             if (e.type == KeyPress) {
                 int key = XLookupKeysym(&e.xkey, 0);
                 if (key == XK_Return) {
                     startScreenActive = false;
+		    stopOpenALSound();
                     break;
                 }
             }
@@ -157,8 +175,9 @@ void initObj()
 int main() {
     X11_wrapper x11;
     init_opengl();
-    renderStartScreen(gl.xres, gl.yres, x11, gl); // Display start screen
-    waitForEnterKey(x11);;   // Wait for Enter 
+    //playLoopingSound();
+    renderStartScreen(gl.xres, gl.yres, x11, gl);   // Display start screen
+    waitForEnterKey(x11);;   // Wait for Enter Key
     clock_gettime(CLOCK_REALTIME, &timePause);
     clock_gettime(CLOCK_REALTIME, &timeStart);
     // Render knife and hp pack
@@ -172,6 +191,7 @@ int main() {
             XEvent e = x11.getXNextEvent();
             x11.check_resize(&e);
             x11.check_mouse(&e);
+	    //startScreenMusic();
             done = x11.check_keys(&e);
         }
         clock_gettime(CLOCK_REALTIME, &timeCurrent);
@@ -181,8 +201,10 @@ int main() {
         x11.swapBuffers();
         //usleep(1000);
 
-
-
+	if (startScreenActive) {
+		cout <<"active" << endl;
+	
+	}
 
         if (!startScreenActive) {
             if (!gameOver){
@@ -577,7 +599,7 @@ void physics()
 
 void render()
 {
-    
+    //startScreenMusic();
     render_calls();
     
     glClear(GL_COLOR_BUFFER_BIT);

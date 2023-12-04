@@ -2,7 +2,9 @@
 
 #include <time.h>
 #include "X11_wrapper.h"
-
+#include <stdio.h>
+#include <unistd.h>
+#include <AL/alut.h>
 // cestes.h
 #ifndef _CESTES_H_
 #define _CESTES_H_
@@ -116,4 +118,6 @@ bool Check2(Square burger, Enemy enemy);
 void renderOil();
 bool Check3(Square burger,Oil oil);
 void renderGameOver( int xres, int yres, X11_wrapper& x11, Global& gl);
+bool playOpenALSound(const char* soundFilePath);
+void stopOpenALSound();
 #endif

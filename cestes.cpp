@@ -10,6 +10,13 @@
 #include <ctime>
 #include <cstring>
 #include <unistd.h>
+#include <sys/stat.h>
+#include </usr/include/AL/alut.h>
+#include <cstdio>
+#include <AL/alut.h>
+#include <stdio.h>
+//#ifdef USE_OPENAL_SOUND
+//#endif
 /*
 
 void display_border(int xres, int yres)
@@ -237,12 +244,59 @@ void renderGameOver( int xres, int yres, X11_wrapper& x11, Global& gl) {
 
     x11.swapBuffers();
 }
+// Global or static variables to store the AL source and buffer
+ALuint alSource;
+ALuint alBuffer;
 
+bool playOpenALSound(const char* soundFilePath) {
+    // Initialize ALUT
+    if (!alutInit(0, NULL)) {
+        printf("ERROR: alutInit()\n");
+        return false;
+    }
 
+    // Clear error state
+    alGetError();
 
-// burger_dash.cpp
+    // Setup the listener
+    float vec[6] = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f};
+    alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
+    alListenerfv(AL_ORIENTATION, vec);
+    alListenerf(AL_GAIN, 1.0f);
 
+    // Buffer holds the sound information
+    alBuffer = alutCreateBufferFromFile(soundFilePath);
 
+    // Check for buffer loading errors
+    if (alGetError() != AL_NO_ERROR) {
+        printf("ERROR: loading buffer\n");
+        alutExit();
+        return false;
+    }
 
-// ... other definitions ...
+    // Source refers to the sound
+    alGenSources(1, &alSource);
+    alSourcei(alSource, AL_BUFFER, alBuffer);
+
+    // Set volume and pitch, enable looping of sound
+    alSourcef(alSource, AL_GAIN, 1.0f);
+    alSourcef(alSource, AL_PITCH, 1.0f);
+    alSourcei(alSource, AL_LOOPING, AL_TRUE);
+
+    // Play the sound
+    alSourcePlay(alSource);
+
+    return true;
+}
+void stopOpenALSound() {
+    // Stop the source
+    alSourceStop(alSource);
+
+    // Cleanup
+    alDeleteSources(1, &alSource);
+    alDeleteBuffers(1, &alBuffer);
+
+    // Cleanup ALUT
+    alutExit();
+}
 
