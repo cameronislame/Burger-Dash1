@@ -590,6 +590,13 @@ void physics()
             ST = 1;
     }
 
+     if (burger.pos[0] - burger.width > enemy.pos[0] + enemy.width && !enemy.pointClaimed) {
+        enemy.pointClaimed = true;
+        gl.score += 1;
+        //re-Render knives when the user has an even amount of points
+        if(gl.score % 2 == 0)
+            ST = 1;
+    }
 
 
 

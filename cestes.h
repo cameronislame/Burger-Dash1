@@ -37,6 +37,7 @@ public:
     float pos[2];
     float vel[2];
     float width;
+    bool pointClaimed;
     float height;
     Enemy() {
         init();
@@ -47,6 +48,7 @@ public:
         pos[0] = 1000.0f;
         pos[1] = 0.0f + height;
         vel[0] = -12.0f;
+        pointClaimed = false;
         //pos[0] += vel[0];
     }
 };
