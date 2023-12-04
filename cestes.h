@@ -45,7 +45,7 @@ public:
     void init() {
         width = 30.0f;
         height = 30.0f;
-        pos[0] = 1000.0f;
+        pos[0] = 1300.0f;
         pos[1] = 0.0f + height;
         vel[0] = -12.0f;
         pointClaimed = false;
