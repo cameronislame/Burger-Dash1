@@ -75,6 +75,9 @@ void display_credits(int xres, int yres)
     ggprint8b(&r, 16, 0x00ffff00, "Conner Estes");
     ggprint8b(&r, 16, 0x00ffff00, "Jesus Baltazar");
     ggprint8b(&r, 16, 0x00ffff00, "Mario Jimenez");
+    ggprint8b(&r, 16, 0x00ffff00, "");
+    ggprint8b(&r, 16, 0x00ffff00, "Sound Design:");
+    ggprint8b(&r, 16, 0x00ffff00, "joshuaempyre on Freesong");
 
 }
 
