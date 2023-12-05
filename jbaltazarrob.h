@@ -5,7 +5,7 @@
 /**
  * Author:    Jesus Baltazar Robles
  * Created:   9/29/2023
- *
+ * 
  **/
 /*Header files that will define level design and objects implementation*/
 typedef double Flt;
@@ -14,6 +14,12 @@ class Level {
     public:
     unsigned char arr[52][304];
     unsigned char burgerArr[14][13];
+    unsigned char titleArtArr[45][83];
+    unsigned char fireArtArr[13][16];
+    unsigned char trampArtArr[8][12];
+    unsigned char knifeArtArr[5][13];
+    unsigned char knifeBlockArtArr[18][32];
+    unsigned char healthArtArr[9][9];
     std::string imageName;
     int nrows, ncols;
     int tilesize[2];
@@ -25,16 +31,7 @@ class Level {
 };
 //Create health powerup
 extern Square hp_pack;
-//Knife obj
-extern Square knife1;
-extern Square knife2;
-extern Square knife3;
-
-
-void initKnives();
 void init_hpPack();
-void render_knives(int state);
-void render_hp_pack(int state);
 void render_calls();
 float total_render_function_calls();
 #endif

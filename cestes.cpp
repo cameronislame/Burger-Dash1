@@ -15,8 +15,9 @@
 #include <cstdio>
 #include <AL/alut.h>
 #include <stdio.h>
-//#ifdef USE_OPENAL_SOUND
-//#endif
+
+
+
 /*
 
 void display_border(int xres, int yres)
@@ -93,6 +94,7 @@ bool Check3(Square burger, Oil oil) {
 
 // Definition of the collision detection function
 bool Check2(Square burger, Enemy enemy) {
+    bool enemyCollisionOccurred = false;
     int leftBurger = burger.pos[0] - burger.width;
     int rightBurger = burger.pos[0] + burger.width;
     int topBurger = burger.pos[1] - burger.height;
@@ -110,7 +112,6 @@ bool Check2(Square burger, Enemy enemy) {
         return false;
 
     // If there is a collision, set burger's velocity to 0
-    
     return true;
 }
 
@@ -226,20 +227,25 @@ void renderOil(){
 void renderGameOver( int xres, int yres, X11_wrapper& x11, Global& gl) {
     glClear(GL_COLOR_BUFFER_BIT);
     unsigned int c = 0x00ffff44;
-    
+    // Render game over message and any other elements of the game over screen.
+    // You can use glColor3ub, glPushMatrix, glBegin, glEnd, and other OpenGL functions
+    // to draw text and graphics for the game over screen.
+    // For example:
     glColor3ub(255, 0, 0); // Red color
-  
+    // Position and draw your game over message.
+    // Example:
     Rect gameOverText;
     gameOverText.bot = yres / 2;
     gameOverText.left = xres / 2;
     gameOverText.center = 1;
     ggprint8b(&gameOverText, 16, c, "Game Over");
 
-   
+    // Render any other game over elements as needed.
 
     x11.swapBuffers();
 }
-// Global or static variables to store the AL source and buffer
+
+
 ALuint alSource;
 ALuint alBuffer;
 
@@ -294,4 +300,10 @@ void stopOpenALSound() {
     // Cleanup ALUT
     alutExit();
 }
+
+// burger_dash.cpp
+
+
+
+// ... other definitions ...
 

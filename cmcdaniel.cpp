@@ -12,43 +12,6 @@
 #include <GL/glx.h>
 #include <time.h>
 
-/*
-   void display_name(int x, int y) 
-   {
-   Rect r;
-   r.bot = y;
-   r.left = x;
-   r.center = 0;
-   ggprint8b(&r, 0, 0x00ffff00, "Cameron");
-
-   }
-
-   void display_border(int xres, int yres)
-   {
-   int b = 50;
-   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-   glEnable(GL_BLEND);
-   glColor4f(1.0f, 1.0f, 0.0f, 0.5f);
-   glPushMatrix();
-   glBegin(GL_TRIANGLE_STRIP);
-   glVertex2i(0,      0);
-   glVertex2i(0+b,    0+b);
-   glVertex2i(0,      0+yres);
-   glVertex2i(0+b,    0+yres-b);
-   glVertex2i(xres,   0+yres);
-   glVertex2i(xres-b, 0+yres-b);
-   glVertex2i(xres,   0);
-   glVertex2i(xres-b, b);
-
-   glVertex2i(0, 0);
-
-   glVertex2i(0+b,     0+b);
-   glEnd();
-   glPopMatrix();
-   glDisable(GL_BLEND);
-
-   }
-   */
 void display_credits(int xres, int yres) 
 {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -75,9 +38,6 @@ void display_credits(int xres, int yres)
     ggprint8b(&r, 16, 0x00ffff00, "Conner Estes");
     ggprint8b(&r, 16, 0x00ffff00, "Jesus Baltazar");
     ggprint8b(&r, 16, 0x00ffff00, "Mario Jimenez");
-    ggprint8b(&r, 16, 0x00ffff00, "");
-    ggprint8b(&r, 16, 0x00ffff00, "Sound Design:");
-    ggprint8b(&r, 16, 0x00ffff00, "joshuaempyre on Freesong");
 
 }
 
@@ -94,6 +54,274 @@ int time_since_mouse_move(const bool get)
     }
     return time(NULL) - mouse_timer;
 }
+
+
+void renderHealth(Square burger, Level lev) {
+    int tx = lev.tilesize[0];
+    int ty = lev.tilesize[1];
+    Flt dd = lev.ftsz[0];
+    Flt offy = lev.tile_base;
+
+    for (int j = 0; j < lev.ncols; j++) {
+        for (int i = 0; i < lev.nrows; i++) {
+            int row = lev.nrows - 1 - i; 
+            int col = j;
+            if (lev.healthArtArr[row][col] == '.') {
+                glColor3ub(0, 0, 0);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.healthArtArr[row][col] == '+') {
+                glColor3ub(255, 255, 255);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.healthArtArr[row][col] == '@') {
+                glColor3ub(217, 87, 99);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.healthArtArr[row][col] == '#') {
+                glColor3ub(172, 50, 50);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.healthArtArr[row][col] == '$') {
+                glColor3ub(155, 173, 183);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+        }
+    }
+}
+
+void renderKnifeBlock(Square burger, Level lev) {
+    int tx = lev.tilesize[0];
+    int ty = lev.tilesize[1];
+    Flt dd = lev.ftsz[0];
+    Flt offy = lev.tile_base;
+
+    for (int j = 0; j < lev.ncols; j++) {
+        for (int i = 0; i < lev.nrows; i++) {
+            int row = lev.nrows - 1 - i; 
+            int col = j;
+            if (lev.knifeBlockArtArr[row][col] == '.') {
+                glColor3ub(0, 0, 0);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.knifeBlockArtArr[row][col] == '+') {
+                glColor3ub(134, 134, 134); 
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.knifeBlockArtArr[row][col] == '@') {
+                glColor3ub(105, 106, 106);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.knifeBlockArtArr[row][col] == '#') {
+                glColor3ub(91, 9, 9); 
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.knifeBlockArtArr[row][col] == '$') {
+                glColor3ub(164, 17, 17); 
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.knifeBlockArtArr[row][col] == '%') {
+                glColor3ub(102, 57, 49); 
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.knifeBlockArtArr[row][col] == '&') {
+                glColor3ub(55, 31, 27); 
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.knifeBlockArtArr[row][col] == '*') {
+                glColor3ub(138, 77, 66);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+        }
+    }
+}
+
+void renderTramp(Square burger, Level lev) {
+    int tx = lev.tilesize[0];
+    int ty = lev.tilesize[1];
+    Flt dd = lev.ftsz[0];
+    Flt offy = lev.tile_base;
+
+    for (int j = 0; j < lev.ncols; j++) {
+        for (int i = 0; i < lev.nrows; i++) {
+            int row = lev.nrows - 1 - i; 
+            int col = j;
+            if (lev.trampArtArr[row][col] == '.') {
+                glColor3ub(0, 0, 0);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.trampArtArr[row][col] == '+') {
+                glColor3ub(91, 110, 225); 
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.trampArtArr[row][col] == '@') {
+                glColor3ub(56, 56, 56); 
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.trampArtArr[row][col] == '#') {
+                glColor3ub(73, 73, 73); 
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.trampArtArr[row][col] == '$') {
+                glColor3ub(58, 73, 164); 
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+        }
+    }
+}
+
+void renderKnife(Square burger, Level lev) {
+    int tx = lev.tilesize[0];
+    int ty = lev.tilesize[1];
+    Flt dd = lev.ftsz[0];
+    Flt offy = lev.tile_base;
+
+    for (int j = 0; j < lev.ncols; j++) {
+        for (int i = 0; i < lev.nrows; i++) {
+            int row = lev.nrows - 1 - i; 
+            int col = j;
+            if (lev.knifeArtArr[row][col] == '.') {
+                glColor3ub(0, 0, 0);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.knifeArtArr[row][col] == '+') {
+                glColor3ub(134, 134, 134); 
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.knifeArtArr[row][col] == '@') {
+                glColor3ub(105, 106, 106); 
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.knifeArtArr[row][col] == '#') {
+                glColor3ub(91, 9, 9); 
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.knifeArtArr[row][col] == '$') {
+                glColor3ub(164, 17, 17);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+        }
+    }
+}
+
+void renderFire(Square burger, Level lev) {
+    int tx = lev.tilesize[0];
+    int ty = lev.tilesize[1];
+    Flt dd = lev.ftsz[0];
+    Flt offy = lev.tile_base;
+
+    for (int j = 0; j < lev.ncols; j++) {
+        for (int i = 0; i < lev.nrows; i++) {
+            int row = lev.nrows - 1 - i; // Invert row index
+            int col = j;
+            if (lev.fireArtArr[row][col] == '.') {
+                glColor3ub(0, 0, 0);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.fireArtArr[row][col] == '+') {
+                glColor3ub(225, 79, 54);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.fireArtArr[row][col] == '@') {
+                glColor3ub(255, 124, 55);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.fireArtArr[row][col] == '#') {
+                glColor3ub(253, 178, 63);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.fireArtArr[row][col] == '$') {
+                glColor3ub(245, 226, 132);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+        }
+    }
+}
+
+
+
+void renderTitleArt(Square burger, Level lev) {
+    int tx = lev.tilesize[0];
+    int ty = lev.tilesize[1];
+    Flt dd = lev.ftsz[0];
+    Flt offy = lev.tile_base;
+
+    for (int j = 0; j < lev.ncols; j++) {
+        for (int i = 0; i < lev.nrows; i++) {
+            int row = lev.nrows - 1 - i; // Invert row index
+            int col = j;
+            if (lev.titleArtArr[row][col] == '.') {
+                glColor3ub(55, 28, 29);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.titleArtArr[row][col] == '+') {
+                glColor3ub(204, 76, 80);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.titleArtArr[row][col] == '@') {
+                glColor3ub(207, 125, 122);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.titleArtArr[row][col] == '#') {
+                glColor3ub(159, 44, 92);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.titleArtArr[row][col] == '$') {
+                glColor3ub(208, 80, 134);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.titleArtArr[row][col] == '%') {
+                glColor3ub(101, 54, 100);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.titleArtArr[row][col] == '&') {
+                glColor3ub(165, 92, 165);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.titleArtArr[row][col] == '*') {
+                glColor3ub(165, 112, 58);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.titleArtArr[row][col] == '=') {
+                glColor3ub(186, 134, 80);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.titleArtArr[row][col] == '-') {
+                glColor3ub(212, 208, 137);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.titleArtArr[row][col] == ';') {
+                glColor3ub(182, 176, 54);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.titleArtArr[row][col] == '>') {
+                glColor3ub(143, 90, 36);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.titleArtArr[row][col] == ',') {
+                glColor3ub(203, 55, 55);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.titleArtArr[row][col] == '\'') {
+                glColor3ub(172, 50, 50);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.titleArtArr[row][col] == ')') {
+                glColor3ub(95, 55, 36);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.titleArtArr[row][col] == '!') {
+                glColor3ub(78, 134, 40);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.titleArtArr[row][col] == '~') {
+                glColor3ub(103, 177, 52);
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+        }
+    }
+}
+
 
 void renderBurger(Square burger, Level lev, Global gl) {
     int tx = lev.tilesize[0];

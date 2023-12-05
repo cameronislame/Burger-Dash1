@@ -20,20 +20,11 @@
 #include "cmcdaniel.h"
 #include "cestes.h"
 #include "mjimenez.h"
-#include "jbaltazarrob.h"
-#include <sys/stat.h>
-#include </usr/include/AL/alut.h>
-#include <thread>
-#include <string>
-
-
+#include "jbaltazarrob.h" 
 //# Need to work on modified burger_dash on odin but don't want to make
 // changes to main yet, until discussed.
 
-
-
 using namespace std;
-bool loopMusic = true;
 bool startScreenActive = true;
 bool gameOver = false;
 bool restart = false;
@@ -45,8 +36,8 @@ const float GRAVITY = 1.0f;
 double camera[2] = {0.0,0.0};
 
 //set up timers
-extern void startScreenMusic();
-const double physicsRate = 1.0/20.0;
+
+const double physicsRate = 1.0/10.0;
 extern struct timespec timeStart, timeCurrent;
 extern struct timespec timePause;
 extern double physicsCountdown;
@@ -56,32 +47,32 @@ extern void timeCopy(struct timespec *dest, struct timespec *source);
 
 
 /*
-class Global {
-    public:
-        int xres, yres;
-        double physicsCountdown;
-        double timeSpan;
-        unsigned int keys[65536];
-        int score;
-        bool show_border;
-        bool display_credits;
-        bool CheckCollision2;
-        double delay;
-        bool display_statistics;
-        time_t begin;
-        time_t key_checker;
-        Global() {
-            show_border = false;
-            display_credits = false;
-            display_statistics = false;
-            xres = 1200;
-            yres = 600;
-            score = 0;
-            delay = 0.1;
-            time(&begin);
-            time(&key_checker);
-        }
-} gl; */
+   class Global {
+   public:
+   int xres, yres;
+   double physicsCountdown;
+   double timeSpan;
+   unsigned int keys[65536];
+   int score;
+   bool show_border;
+   bool display_credits;
+   bool CheckCollision2;
+   double delay;
+   bool display_statistics;
+   time_t begin;
+   time_t key_checker;
+   Global() {
+   show_border = false;
+   display_credits = false;
+   display_statistics = false;
+   xres = 1200;
+   yres = 600;
+   score = 0;
+   delay = 0.1;
+   time(&begin);
+   time(&key_checker);
+   }
+   } gl; */
 Global gl;
 
 class Obstacle {
@@ -92,57 +83,88 @@ class Obstacle {
         float width;
         float height;
         bool pointClaimed;
+        bool active;
         Obstacle() {
             init();
         }
         void init() {
+            active = true;
             pointClaimed = false;
             vel[0] = -5.0f;
             vel[1] = 0.0f;
             width =  30.0f;
-            height = 20.0f;
+            height = 30.0f;
             pos[0] = 900.0f;
-            pos[1] = 0.0f + height;
+            pos[1] = 0.0f;
         }
 } spike;
 
-// Render knives
-int ST = 1;
-int hp_ST = 1;
+//Knife obstacle
+Obstacle knife1;
+Obstacle knife2;
+Obstacle knife3;
 //Square burger;
 
 //Declare global Level class
 Level lev;
 Level burgerSprite(5.0f, 5.0f, "burger.xpm");
-ShieldPowerUp shieldPowerUp;
+Level fireArtSprite(5.0f, 5.0f, "fire.xpm");
+Level knifeArtSprite(5.0f, 5.0f, "knife.xpm");
+Level trampArtSprite(5.0f, 5.0f, "trampoline.xpm");
+Level knifeBlockArtSprite(3.0f, 3.0f, "knifeBlock.xpm");
+Level healthArtSprite(5.0f, 5.0f, "health.xpm");
+Square trampSquare;
+Square fireSquare;;
+Square knifeSquare1;
+Square knifeSquare2;
+Square knifeSquare3;
+Square knifeBlockSquare;
+Square healthSquare;
 //Function prototypes
-void init_opengl(void);
+void init_opengl(void); 
 void physics(void);
 void render(void);
-
-
-
-
-
 
 void waitForEnterKey(X11_wrapper &x11) {
     // XEvent e;
     if (!playOpenALSound("./251461__joshuaempyre__arcade-music-loop.wav")) {
         printf("Failed to play sound.\n");
     }
-    while (startScreenActive) { 
+
+    while (startScreenActive) {
         while (x11.getXPending()) {
             XEvent e = x11.getXNextEvent();
             if (e.type == KeyPress) {
                 int key = XLookupKeysym(&e.xkey, 0);
                 if (key == XK_Return) {
                     startScreenActive = false;
-		            //stopOpenALSound();
                     break;
                 }
             }
         }
     }
+}
+void initObj()
+{
+    //initialize knives in the air
+    knife1.pos[0] = gl.xres + knife1.width;
+    knife1.pos[1] = gl.yres / 4.0;
+    knife1.width = 13.0;
+    knife1.vel[0] = -40;
+    knife1.height = 5.0;
+
+
+    knife2.pos[0] = gl.xres + knife2.width + 20.0;
+    knife2.pos[1] = (gl.yres / 4.0) + 20.0;
+    knife2.width = 13.0;
+    knife2.vel[0] = -40;
+    knife2.height = 5.0;
+
+    knife3.pos[0] = gl.xres + knife3.width + 20;
+    knife3.pos[1] = (gl.yres / 4.0) - 20.0;
+    knife3.width = 13.0;
+    knife3.vel[0] = -40;
+    knife3.height = 5.0;
 }
 //extern bool CheckCollision2(Square burger, Enemy enemy) ;
 
@@ -153,14 +175,13 @@ void waitForEnterKey(X11_wrapper &x11) {
 int main() {
     X11_wrapper x11;
     init_opengl();
-    //playLoopingSound();
-    renderStartScreen(gl.xres, gl.yres, x11, gl);   // Display start screen
-    waitForEnterKey(x11);;   // Wait for Enter Key
+    renderStartScreen(gl.xres, gl.yres, x11, gl); // Display start screen
+    waitForEnterKey(x11);;   // Wait for Enter 
     clock_gettime(CLOCK_REALTIME, &timePause);
     clock_gettime(CLOCK_REALTIME, &timeStart);
     // Render knife and hp pack
     init_hpPack();
-    initKnives();
+    initObj();
     //Main loop
     int done = 0;
     while (!done) {
@@ -169,7 +190,6 @@ int main() {
             XEvent e = x11.getXNextEvent();
             x11.check_resize(&e);
             x11.check_mouse(&e);
-	    //startScreenMusic();
             done = x11.check_keys(&e);
         }
         clock_gettime(CLOCK_REALTIME, &timeCurrent);
@@ -179,19 +199,17 @@ int main() {
         x11.swapBuffers();
         //usleep(1000);
 
-	if (startScreenActive) {
-		cout <<"active" << endl;
-	
-	}
+
+
 
         if (!startScreenActive) {
             if (!gameOver){
-             while (physicsCountdown >= physicsRate) {
-            physics();
-            physicsCountdown -= physicsRate;
+                while (physicsCountdown >= physicsRate) {
+                    physics();
+                    physicsCountdown -= physicsRate;
 
-        }
-            render();
+                }
+                render();
             }
             if (gameOver) {
                 renderGameOver(gl.xres,gl.yres,x11,gl);
@@ -202,28 +220,27 @@ int main() {
                 enemy.init();
                 healthbar.init();
                 oil.init();
-                initKnives();//knife initializer
+                initObj();//knife initializer
                 init_hpPack();
-                shieldPowerUp.init();// Initialize shield power-up
 
 
             }
 
-           
 
-            
-            
-            
+
+
+
+
             x11.swapBuffers();
             usleep(400);
-            }
         }
-        
-       
+    }
 
 
-        
-    
+
+
+
+
     return 0;
 }
 
@@ -375,7 +392,7 @@ int X11_wrapper::check_keys(XEvent *e)
                 enemy.init();
                 healthbar.init();
                 oil.init();
-                initKnives();//knife intializer
+                initObj();//knife intializer
                 init_hpPack();
                 break;
             case XK_Escape:
@@ -413,32 +430,7 @@ void init_opengl(void)
     initialize_fonts();
 }
 
-bool checkCollision(Square burger, Obstacle spike) {
-    
 
-
-    // Calculate the coordinates of the bounding boxes
-    int leftBurger = burger.pos[0] - burger.width;
-    int rightBurger = burger.pos[0] + burger.width;
-    int topBurger = burger.pos[1] - burger.height;
-    int bottomBurger = burger.pos[1] + burger.height;
-
-    int leftSpike = spike.pos[0] - spike.width;
-    int rightSpike = spike.pos[0] + spike.width;
-    int topSpike = spike.pos[1] - spike.height;
-    int bottomSpike = spike.pos[1] + spike.height;
-
-    // If one shape is on the left side of the other
-    if (rightBurger < leftSpike || rightSpike < leftBurger)
-        return false;
-
-    // If one shape is above the other
-    if (bottomBurger < topSpike || bottomSpike < topBurger)
-        return false;
-
-    return true;
-
-}
 bool checkCollision(Square burger, Square spike) {
 
 
@@ -461,18 +453,40 @@ bool checkCollision(Square burger, Square spike) {
     // If one shape is above the other
     if (bottomBurger < topSpike || bottomSpike < topBurger)
         return false;
-
     return true;
 
-}
+} 
+bool checkCollision(Square burger, Obstacle spike) {
+
+
+
+    // Calculate the coordinates of the bounding boxes
+    int leftBurger = burger.pos[0] - burger.width;
+    int rightBurger = burger.pos[0] + burger.width;
+    int topBurger = burger.pos[1] - burger.height;
+    int bottomBurger = burger.pos[1] + burger.height;
+
+    int leftSpike = spike.pos[0] - spike.width;
+    int rightSpike = spike.pos[0] + spike.width;
+    int topSpike = spike.pos[1] - spike.height;
+    int bottomSpike = spike.pos[1] + spike.height;
+
+    // If one shape is on the left side of the other
+    if (rightBurger < leftSpike || rightSpike < leftBurger)
+        return false;
+
+    // If one shape is above the other
+    if (bottomBurger < topSpike || bottomSpike < topBurger)
+        return false;
+    return true;
+
+} 
+
 
 void physics()
 {
-    
+    bool enemyCollisionOccurred = false;
     //int tries;
-
-    // shield power-up physics
-    shieldPowerUp.pos[0] += shieldPowerUp.vel[0];
 
     // spike physics
     spike.pos[0] += spike.vel[0];
@@ -480,12 +494,7 @@ void physics()
     enemy.pos[0] += enemy.vel[0];
     oil.pos[0] += oil.vel[0];
 
-    // Check collision with shield power-up
-    if (Check4(burger, shieldPowerUp)) {
-        shieldPowerUp.activate();
-    }
-
-     //hp pack physics
+    //hp pack physics
     hp_pack.pos[0] += hp_pack.vel[0];
     if (hp_pack.pos[0] + hp_pack.width < 0.0) {
         init_hpPack();
@@ -495,18 +504,24 @@ void physics()
     knife2.pos[0] += knife2.vel[0];
     knife3.pos[0] += knife3.vel[0];
     //knife collision
-    if (!shieldPowerUp.isActivated()) {
-        // Only apply damage if the shield is not active
-        if (checkCollision(burger, knife1) || checkCollision(burger, knife2) || 
-                checkCollision(burger, knife3)) {
-            healthbar.health -= 20;
-            hp_ST = 0;
-            gl.score += 1;
-        }
+    if(checkCollision(burger, knife1) || checkCollision(burger, knife2) ||
+            checkCollision(burger, knife3)) {
+        if (knife1.active)
+            healthbar.health += -100;
+        knife1.active = false;
     }
     if (knife1.pos[0] + knife1.width < 0.0) {
-        ST = 0;
-        initKnives(); 
+        initObj();
+    }
+    if (knife2.pos[0] + knife2.width < 0.0) {
+        initObj();
+    }
+    if (knife3.pos[0] + knife3.width < 0.0) {
+        initObj();
+    }
+    if (checkCollision(burger, hp_pack)) {
+        healthbar.health = 255;
+        hp_pack.active = false;
     }
     // burger physics
     // If burger is off the ground, it is subject to gravity
@@ -534,35 +549,35 @@ void physics()
     // if they collide, send burger back a bit
     if(checkCollision(burger, spike)) {
         //spike.vel[0] = 10;
-        
+
         //burger.vel[0] = -10;
         burger.vel[1] = 0;
 
 
-        
-       
+
+
     }
 
     /*if (enemy.pos[0] <= 400.0f){
-        enemy.vel[0] = 8.0;
+      enemy.vel[0] = 8.0;
 
-    }*/
+      }*/
 
     if (enemy.pos[0] + enemy.width < 0) {
         enemy.init();
 
     }
 
-     if (spike.pos[0] + spike.width < 0) {
+    if (spike.pos[0] + spike.width < 0) {
         spike.init();
 
     }
- 
+
 
 
     if(Check2(burger,enemy)){
         burger.vel[0] = enemy.vel[0];
-        
+
 
     }
 
@@ -579,37 +594,22 @@ void physics()
         }
     }
 
-    
+
 
     //if we clear the obstacle we get a point
     if (burger.pos[0] - burger.width > spike.pos[0] + spike.width && !spike.pointClaimed) {
         spike.pointClaimed = true;
         gl.score += 1;
-        //re-Render knives when the user has an even amount of points
-        if(gl.score % 2 == 0)
-            ST = 1;
-    }
-
-     if (burger.pos[0] - burger.width > enemy.pos[0] + enemy.width && !enemy.pointClaimed) {
-        enemy.pointClaimed = true;
-        gl.score += 1;
-        //re-Render knives when the user has an even amount of points
-        if(gl.score % 2 == 0)
-            ST = 1;
     }
 
 
 
-    if ((checkCollision(burger, spike)) || ((Check2(burger, enemy)))) {
+
+    if ((checkCollision(burger, spike)) || ((Check2(burger, enemy))) && !enemyCollisionOccurred ) {
         healthbar.health = healthbar.health - 20;  // Adjust the amount based on your game's design
-        
-        if (healthbar.health <= 0) {
-            healthbar.health = 0;
-            gameOver = true;
-            
-        }
+        enemyCollisionOccurred  = 1;
 
-      }
+    }
 
 
     if (Check3(burger,oil)) {
@@ -622,53 +622,75 @@ void physics()
 
 void render()
 {
-    //startScreenMusic();
+
     render_calls();
-    
+
     glClear(GL_COLOR_BUFFER_BIT);
     //Draw burger
-    
+
     renderHealth();
     renderLevel(lev, gl, camera);
     renderBurger(burger, burgerSprite, gl);
-    
-    renderEnemy();    
-    renderOil();
 
-    // Render shield power-up
-    if (!shieldPowerUp.isActivated()) {
-        glColor3ub(50, 100, 200);
-        glPushMatrix();
-        glTranslatef(shieldPowerUp.pos[0], shieldPowerUp.pos[1], 0.0f);
-        glBegin(GL_QUADS);
-        glVertex2f(-shieldPowerUp.width, -shieldPowerUp.height);
-        glVertex2f(-shieldPowerUp.width, shieldPowerUp.height);
-        glVertex2f(shieldPowerUp.width, shieldPowerUp.height);
-        glVertex2f(shieldPowerUp.width, -shieldPowerUp.height);
-        glEnd();
-        glPopMatrix();
+    //renderEnemy();   
+
+    //render Enemy 
+    knifeBlockSquare.pos[0] = enemy.pos[0];
+    knifeBlockSquare.pos[1] = enemy.pos[1];
+    knifeBlockSquare.width = 5.0f;
+    knifeBlockSquare.height = 5.0f;
+    renderKnifeBlock(knifeBlockSquare, knifeBlockArtSprite); 
+
+
+    //draw trampoline
+    trampSquare.pos[0] = oil.pos[0];
+    trampSquare.pos[1] = oil.pos[1];
+    trampSquare.width = 5.0f;
+    trampSquare.height = 5.0f;
+    renderTramp(trampSquare, trampArtSprite);
+
+    //renderOil();
+
+    // draw fire
+    fireSquare.pos[0] = spike.pos[0];
+    fireSquare.pos[1] = spike.pos[1];
+    fireSquare.width = 5.0f;
+    fireSquare.height = 5.0f;
+    renderFire(fireSquare, fireArtSprite);
+
+    //Knives in the air
+
+    if (knife1.active) {
+        knifeSquare1.pos[0] = knife1.pos[0];
+        knifeSquare1.pos[1] = knife1.pos[1];
+        knifeSquare1.width = 5.0f;
+        knifeSquare1.height = 5.0f;
+        renderKnife(knifeSquare1, knifeArtSprite);
+
+        knifeSquare2.pos[0] = knife2.pos[0];
+        knifeSquare2.pos[1] = knife2.pos[1];
+        knifeSquare2.width = 5.0f;
+        knifeSquare2.height = 5.0f;
+        renderKnife(knifeSquare2, knifeArtSprite);
+
+        knifeSquare3.pos[0] = knife3.pos[0];
+        knifeSquare3.pos[1] = knife3.pos[1];
+        knifeSquare3.width = 5.0f;
+        knifeSquare3.height = 5.0f;
+        renderKnife(knifeSquare3, knifeArtSprite);
     }
 
-    //draw spike
-    glPushMatrix();
-    glColor3ub(250,0,0);
-    glTranslatef(spike.pos[0], spike.pos[1], 0.0f);
-    glBegin(GL_QUADS);
-    glVertex2f(-spike.width, -spike.height);
-    glVertex2f(-spike.width,  spike.height);
-    glVertex2f( spike.width,  spike.height);
-    glVertex2f( spike.width, -spike.height);
-    glEnd();
-    glPopMatrix();
-    //Render knives
-    render_knives(ST);
-    
+
     //render hp pack in the air
-    if(healthbar.health < 170) {
-        render_hp_pack(hp_ST);
-        hp_ST = 1;
+    if (hp_pack.active) {
+        healthSquare.pos[0] = hp_pack.pos[0];
+        healthSquare.pos[1] = hp_pack.pos[1];
+        healthSquare.width = 5.0f;
+        healthSquare.height = 5.0f;
+        renderHealth(healthSquare, healthArtSprite);
     }
-    
+
+
     unsigned int c = 0x00ffff44;
     Rect r;
     r.bot = gl.yres - 20;
@@ -682,8 +704,13 @@ void render()
     ggprint8b(&r, 16, c, "Press S for statistics");
     ggprint8b(&r, 16, c, "score: %i", gl.score);
 
+    if (healthbar.health <= 0) {
+        healthbar.health = 0;
+        gameOver = true;
+
+    }
     if (gameOver) {
-        
+
 
     }
 
@@ -703,15 +730,15 @@ void render()
         r1.center = 0;
 
         ggprint8b(&r1, 16, c, "STATISTICS");
-        
+
         // uncomment once yours works :D
         ggprint8b(&r1, 16, c, "n physics calls: %i", total_physics_function_calls());
         ggprint8b(&r1, 16, c, "n render calls: %f", total_render_function_calls());
         ggprint8b(&r1, 16, c, "time since last key press: %i seconds", time_since_key_press(gl.key_checker));
-        
+
         ggprint8b(&r1, 16, c, "time elapsed: %i seconds", total_running_time(gl.begin));
         ggprint8b(&r1, 16, c, "time since last mouse move: %i seconds", time_since_mouse_move(false));
-        }
+    }
 
 
 }

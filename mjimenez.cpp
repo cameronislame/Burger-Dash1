@@ -4,7 +4,7 @@
  * File: mjimenez.cpp
  * Description: Mario Jimenez Source File 
  **/
-
+#include "cmcdaniel.h"
 #include "mjimenez.h"
 #include "fonts.h"
 #include "X11_wrapper.h"
@@ -20,11 +20,12 @@ void renderStartScreen(int xres, int yres, X11_wrapper& x11, Global& gl) {
     // Calculate the center of the screen
     int centerX = xres / 2;
     int centerY = yres / 2;
-    // Calculate the position of the square relative to the center
-    int squareWidth = 800; // Increase the size as needed
+    // Calculate the position of the yellow square relative to the center
+    int squareWidth = 500; // Increase the size as needed
     int squareHeight = 300;
     int squareX = centerX - (squareWidth / 2);
     int squareY = centerY - (squareHeight / 2);
+    /*
     // Draw the larger yellow square in the center
     glColor3ub(255, 255, 0);
     glPushMatrix();
@@ -37,7 +38,7 @@ void renderStartScreen(int xres, int yres, X11_wrapper& x11, Global& gl) {
     glEnd();
     glPopMatrix();
     // Text Color
-    unsigned int c = 0xf0f00044;
+    unsigned int c = 0xf0f00044; // Color
     Rect r;
     r.bot = squareY + (squareHeight / 2); // Center vertically
     r.left = squareX + (squareWidth / 2); // Center horizontally
@@ -48,13 +49,21 @@ void renderStartScreen(int xres, int yres, X11_wrapper& x11, Global& gl) {
     r.left = centerX;
     r.center = 1;
     ggprint8b(&r, 16, c, "Press Enter to Start");
+    */
+    Level titleArtSprite(5.0f, 5.0f, "titleSprite.xpm");
+    Square titleArt;
+    titleArt.pos[0] = squareX;
+    titleArt.pos[1] = squareY;
+    titleArt.width = 5.0f;
+    titleArt.height = 5.0f;
+    renderTitleArt(titleArt, titleArtSprite);
 
     x11.swapBuffers();
 }
 
 void display_border(int xres, int yres)
 {
-    // Draw a border around the window
+    // draw a border around the window
 
     int b = 50;
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
@@ -75,62 +84,6 @@ void display_border(int xres, int yres)
     glEnd();
     glPopMatrix();
     glDisable(GL_BLEND);
-}
-
-void ShieldPowerUp::init() {
-    // Initial position
-    pos[0] = 600.0f;
-    // y-position
-    pos[1] = 100.0f + height;
-
-    // Initial velocity
-    // x-velocity
-    vel[0] = -40.0f;
-    vel[1] = 0.0f;
-
-    // Set width and height of the power-up
-    width = 15.0f;
-    height = 15.0f;
-
-    // power-up inactive initially
-    active = false;
-    activated = false;
-    // Initialize to zero
-    activationTime = 0;
-}
-
-void ShieldPowerUp::activate() {
-    active = true;
-    activationTime = time(nullptr);
-}
-
-bool ShieldPowerUp::isActivated() {
-    if (active && (time(nullptr) - activationTime) < 10) {
-        return true;
-    } else {
-        active = false;
-        return false;
-    }
-}
-
-bool Check4(Square burger, ShieldPowerUp shieldPowerUp) {
-    int leftBurger = burger.pos[0] - burger.width;
-    int rightBurger = burger.pos[0] + burger.width;
-    int topBurger = burger.pos[1] - burger.height;
-    int bottomBurger = burger.pos[1] + burger.height;
-
-    int leftShield = shieldPowerUp.pos[0] - shieldPowerUp.width;
-    int rightShield = shieldPowerUp.pos[0] + shieldPowerUp.width;
-    int topShield = shieldPowerUp.pos[1] - shieldPowerUp.height;
-    int bottomShield = shieldPowerUp.pos[1] + shieldPowerUp.height;
-
-    if (rightBurger < leftShield || rightShield < leftBurger)
-        return false;
-
-    if (bottomBurger < topShield || bottomShield < topBurger)
-        return false;
-
-    return true;
 }
 
 /*

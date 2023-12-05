@@ -39,6 +39,12 @@ extern int total_running_time(time_t begin);
 extern int time_since_mouse_move(const bool get);
 extern void renderLevel(Level lev, Global gl, double* camera);
 extern void renderBurger(Square burger, Level lev,  Global gl);
+extern void renderFire(Square burger, Level lev);
+extern void renderKnife(Square burger, Level lev);
+extern void renderTramp(Square burger, Level lev);
+extern void renderKnifeBlock(Square burger, Level lev);
+extern void renderHealth(Square burger, Level lev);
+extern void renderTitleArt(Square burger, Level lev);
 extern void renderSquare(Square burger, int j, int i, Flt dd, Flt offy, int tx, int ty);
 class cameron{
 	int abc;

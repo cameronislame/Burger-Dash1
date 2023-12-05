@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <AL/alut.h>
+
 // cestes.h
 #ifndef _CESTES_H_
 #define _CESTES_H_
@@ -22,9 +23,10 @@ class Oil {
             init();
         }
         void init(){
-            width = 30.0f;
-            height = 3.0f;
-            pos[0] = 1000.0f;
+            width = 12.0f;
+            height = 8.0f;
+            pos[0] = 1500.0f;
+            pos[1] = 1.0f;
             vel[0] = -5.0f;
         }
 };
@@ -37,18 +39,16 @@ public:
     float pos[2];
     float vel[2];
     float width;
-    bool pointClaimed;
     float height;
     Enemy() {
         init();
     }
     void init() {
-        width = 30.0f;
-        height = 30.0f;
-        pos[0] = 1300.0f;
-        pos[1] = 0.0f + height;
-        vel[0] = -12.0f;
-        pointClaimed = false;
+        width = 18.0f;
+        height = 32.0f;
+        pos[0] = 1200.0f;
+        pos[1] = 0.0f;
+        vel[0] = -5.0f;
         //pos[0] += vel[0];
     }
 };
@@ -89,6 +89,7 @@ class Square {
         float verts[4][2];
         float width;
         float height;
+        float active;
         Square() {
             init();
 
@@ -100,6 +101,7 @@ class Square {
             height = 5.0f;
             pos[0] = 500.0f;
             pos[1] = 0.0f + height;
+            active = true;
         }
 };
 
