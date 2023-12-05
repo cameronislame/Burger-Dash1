@@ -37,7 +37,7 @@ double camera[2] = {0.0,0.0};
 
 //set up timers
 
-const double physicsRate = 1.0/10.0;
+const double physicsRate = 1.0/20.0;
 extern struct timespec timeStart, timeCurrent;
 extern struct timespec timePause;
 extern double physicsCountdown;
