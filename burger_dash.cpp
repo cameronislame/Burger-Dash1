@@ -120,6 +120,7 @@ Square knifeSquare2;
 Square knifeSquare3;
 Square knifeBlockSquare;
 Square healthSquare;
+ShieldPowerUp shieldPowerUp;
 //Function prototypes
 void init_opengl(void); 
 void physics(void);
@@ -144,6 +145,7 @@ void waitForEnterKey(X11_wrapper &x11) {
         }
     }
 }
+
 void initObj()
 {
     //initialize knives in the air
@@ -165,6 +167,8 @@ void initObj()
     knife3.width = 13.0;
     knife3.vel[0] = -40;
     knife3.height = 5.0;
+    // Initialize shield power-up
+    shieldPowerUp.init();
 }
 //extern bool CheckCollision2(Square burger, Enemy enemy) ;
 
@@ -175,8 +179,10 @@ void initObj()
 int main() {
     X11_wrapper x11;
     init_opengl();
-    renderStartScreen(gl.xres, gl.yres, x11, gl); // Display start screen
-    waitForEnterKey(x11);;   // Wait for Enter 
+    // Display start screen
+    renderStartScreen(gl.xres, gl.yres, x11, gl);
+    // Wait for Enter 
+    waitForEnterKey(x11);;
     clock_gettime(CLOCK_REALTIME, &timePause);
     clock_gettime(CLOCK_REALTIME, &timeStart);
     // Render knife and hp pack
@@ -223,23 +229,12 @@ int main() {
                 initObj();//knife initializer
                 init_hpPack();
 
-
             }
-
-
-
-
-
 
             x11.swapBuffers();
             usleep(400);
         }
     }
-
-
-
-
-
 
     return 0;
 }
@@ -412,8 +407,6 @@ int X11_wrapper::check_keys(XEvent *e)
     return 0;
 }
 
-
-
 void init_opengl(void)
 {
     //OpenGL initialization
@@ -430,11 +423,7 @@ void init_opengl(void)
     initialize_fonts();
 }
 
-
 bool checkCollision(Square burger, Square spike) {
-
-
-
     // Calculate the coordinates of the bounding boxes
     int leftBurger = burger.pos[0] - burger.width;
     int rightBurger = burger.pos[0] + burger.width;
@@ -457,9 +446,6 @@ bool checkCollision(Square burger, Square spike) {
 
 } 
 bool checkCollision(Square burger, Obstacle spike) {
-
-
-
     // Calculate the coordinates of the bounding boxes
     int leftBurger = burger.pos[0] - burger.width;
     int rightBurger = burger.pos[0] + burger.width;
@@ -482,17 +468,24 @@ bool checkCollision(Square burger, Obstacle spike) {
 
 } 
 
-
 void physics()
 {
     bool enemyCollisionOccurred = false;
     //int tries;
+
+    // shield power-up physics
+    shieldPowerUp.pos[0] += shieldPowerUp.vel[0];
 
     // spike physics
     spike.pos[0] += spike.vel[0];
 
     enemy.pos[0] += enemy.vel[0];
     oil.pos[0] += oil.vel[0];
+
+    // Check collision with shield power-up
+    if (Check4(burger, shieldPowerUp)) {
+        shieldPowerUp.activate();
+    }
 
     //hp pack physics
     hp_pack.pos[0] += hp_pack.vel[0];
@@ -504,11 +497,14 @@ void physics()
     knife2.pos[0] += knife2.vel[0];
     knife3.pos[0] += knife3.vel[0];
     //knife collision
-    if(checkCollision(burger, knife1) || checkCollision(burger, knife2) ||
-            checkCollision(burger, knife3)) {
-        if (knife1.active)
-            healthbar.health += -100;
-        knife1.active = false;
+    if (!shieldPowerUp.isActivated()) {
+        // Only apply damage if the shield is not active
+        if(checkCollision(burger, knife1) || checkCollision(burger, knife2) ||
+                checkCollision(burger, knife3)) {
+            if (knife1.active)
+                healthbar.health += -100;
+            knife1.active = false;
+        }
     }
     if (knife1.pos[0] + knife1.width < 0.0) {
         initObj();
@@ -553,9 +549,6 @@ void physics()
         //burger.vel[0] = -10;
         burger.vel[1] = 0;
 
-
-
-
     }
 
     /*if (enemy.pos[0] <= 400.0f){
@@ -573,19 +566,13 @@ void physics()
 
     }
 
-
-
     if(Check2(burger,enemy)){
         burger.vel[0] = enemy.vel[0];
 
-
     }
 
-
-
-
     for(int i = 0; i<50; i++){
-        //render the level while burger is in motion
+        // render the level while burger is in motion
         if(burger.vel[0] >= 0.0){
             camera[0] += 2.0/lev.tilesize[0] * (0.05 / gl.delay);
             if (camera[0] < 0.0) {
@@ -594,21 +581,19 @@ void physics()
         }
     }
 
-
-
-    //if we clear the obstacle we get a point
+    // if we clear the obstacle we get a point
     if (burger.pos[0] - burger.width > spike.pos[0] + spike.width && !spike.pointClaimed) {
         spike.pointClaimed = true;
         gl.score += 1;
     }
 
+    if (!shieldPowerUp.isActivated()) {
+        // Only apply damage if the shield is not active
+        if ((checkCollision(burger, spike) || (Check2(burger, enemy))) && !enemyCollisionOccurred) {
+            healthbar.health = healthbar.health - 20;  // Adjust the amount based on your game's design
+            enemyCollisionOccurred  = 1;
 
-
-
-    if ((checkCollision(burger, spike)) || ((Check2(burger, enemy))) && !enemyCollisionOccurred ) {
-        healthbar.health = healthbar.health - 20;  // Adjust the amount based on your game's design
-        enemyCollisionOccurred  = 1;
-
+        }
     }
 
 
@@ -616,8 +601,6 @@ void physics()
         burger.vel[1] = -20.0;
     }
 }
-
-
 
 
 void render()
@@ -690,6 +673,19 @@ void render()
         renderHealth(healthSquare, healthArtSprite);
     }
 
+    // Render shield power-up
+    if (!shieldPowerUp.isActivated()) {
+        glColor3ub(50, 100, 200);
+        glPushMatrix();
+        glTranslatef(shieldPowerUp.pos[0], shieldPowerUp.pos[1], 0.0f);
+        glBegin(GL_QUADS);
+        glVertex2f(-shieldPowerUp.width, -shieldPowerUp.height);
+        glVertex2f(-shieldPowerUp.width, shieldPowerUp.height);
+        glVertex2f(shieldPowerUp.width, shieldPowerUp.height);
+        glVertex2f(shieldPowerUp.width, -shieldPowerUp.height);
+        glEnd();
+        glPopMatrix();
+    }
 
     unsigned int c = 0x00ffff44;
     Rect r;
