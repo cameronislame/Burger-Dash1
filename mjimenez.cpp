@@ -63,7 +63,7 @@ void renderStartScreen(int xres, int yres, X11_wrapper& x11, Global& gl) {
 
 void display_border(int xres, int yres)
 {
-    // draw a border around the window
+    // Draw a border around the window
 
     int b = 50;
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
@@ -84,6 +84,62 @@ void display_border(int xres, int yres)
     glEnd();
     glPopMatrix();
     glDisable(GL_BLEND);
+}
+
+void ShieldPowerUp::init() {
+    // Initial position
+    pos[0] = 550.0f;
+    // y-position
+    pos[1] = 100.0f + height;
+
+    // Initial velocity
+    // x-velocity
+    vel[0] = -60.0f;
+    vel[1] = 0.0f;
+
+    // Set width and height of the power-up
+    width = 10.0f;
+    height = 10.0f;
+
+    // power-up inactive initially
+    active = false;
+    activated = false;
+    // Initialize to zero
+    activationTime = 0;
+}
+
+void ShieldPowerUp::activate() {
+    active = true;
+    activationTime = time(nullptr);
+}
+
+bool ShieldPowerUp::isActivated() {
+    if (active && (time(nullptr) - activationTime) < 15) {
+        return true;
+    } else {
+        active = false;
+        return false;
+    }
+}
+
+bool Check4(Square burger, ShieldPowerUp shieldPowerUp) {
+    int leftBurger = burger.pos[0] - burger.width;
+    int rightBurger = burger.pos[0] + burger.width;
+    int topBurger = burger.pos[1] - burger.height;
+    int bottomBurger = burger.pos[1] + burger.height;
+
+    int leftShield = shieldPowerUp.pos[0] - shieldPowerUp.width;
+    int rightShield = shieldPowerUp.pos[0] + shieldPowerUp.width;
+    int topShield = shieldPowerUp.pos[1] - shieldPowerUp.height;
+    int bottomShield = shieldPowerUp.pos[1] + shieldPowerUp.height;
+
+    if (rightBurger < leftShield || rightShield < leftBurger)
+        return false;
+
+    if (bottomBurger < topShield || bottomShield < topBurger)
+        return false;
+
+    return true;
 }
 
 /*
