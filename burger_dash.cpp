@@ -567,8 +567,8 @@ void physics()
     }
 
     if(Check2(burger,enemy)){
-        burger.vel[0] = enemy.vel[0];
-
+       if (!shieldPowerUp.isActivated())
+           burger.vel[0] = enemy.vel[0];
     }
 
     for(int i = 0; i<50; i++){
