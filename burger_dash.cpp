@@ -37,7 +37,7 @@ double camera[2] = {0.0,0.0};
 
 //set up timers
 
-const double physicsRate = 1.0/20.0;
+const double physicsRate = 1.0/30.0;
 extern struct timespec timeStart, timeCurrent;
 extern struct timespec timePause;
 extern double physicsCountdown;
@@ -113,8 +113,10 @@ Level knifeArtSprite(5.0f, 5.0f, "knife.xpm");
 Level trampArtSprite(5.0f, 5.0f, "trampoline.xpm");
 Level knifeBlockArtSprite(3.0f, 3.0f, "knifeBlock.xpm");
 Level healthArtSprite(5.0f, 5.0f, "health.xpm");
+Level gameOverSprite(5.0f, 5.0f, "gameOver.xpm");
+Square gameOverSquare;
 Square trampSquare;
-Square fireSquare;;
+Square fireSquare;
 Square knifeSquare1;
 Square knifeSquare2;
 Square knifeSquare3;
@@ -218,21 +220,15 @@ int main() {
                 render();
             }
             if (gameOver) {
-                renderGameOver(gl.xres,gl.yres,x11,gl);
-                usleep(1000000); 
-                gameOver = false;
-                burger.init();
-                spike.init();
-                enemy.init();
-                healthbar.init();
-                oil.init();
-                initObj();//knife initializer
-                init_hpPack();
-
+                glClear(GL_COLOR_BUFFER_BIT);
+                //renderGameOver(gl.xres,gl.yres,x11,gl);
+                gameOverSquare.pos[0] = gl.xres/2 - 2.5 * 58.0f;
+                gameOverSquare.pos[1] = gl.yres/2 - 2.5 * 35.0f;
+                gameOverSquare.width = 5.0f;
+                gameOverSquare.height = 5.0f;
+                renderGameOverArt(gameOverSquare, gameOverSprite);
+                x11.swapBuffers();
             }
-
-            x11.swapBuffers();
-            usleep(400);
         }
     }
 
@@ -389,6 +385,7 @@ int X11_wrapper::check_keys(XEvent *e)
                 oil.init();
                 initObj();//knife intializer
                 init_hpPack();
+                gameOver=false;
                 break;
             case XK_Escape:
                 //Escape key was pressed
@@ -567,8 +564,8 @@ void physics()
     }
 
     if(Check2(burger,enemy)){
-       if (!shieldPowerUp.isActivated())
-           burger.vel[0] = enemy.vel[0];
+        if (!shieldPowerUp.isActivated())
+            burger.vel[0] = enemy.vel[0];
     }
 
     for(int i = 0; i<50; i++){

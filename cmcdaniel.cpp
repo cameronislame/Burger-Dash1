@@ -239,6 +239,48 @@ void renderFire(Square burger, Level lev) {
 }
 
 
+void renderGameOverArt(Square burger, Level lev) {
+    int tx = lev.tilesize[0];
+    int ty = lev.tilesize[1];
+    Flt dd = lev.ftsz[0];
+    Flt offy = lev.tile_base;
+
+    for (int j = 0; j < lev.ncols; j++) {
+        for (int i = 0; i < lev.nrows; i++) {
+            int row = lev.nrows - 1 - i; // Invert row index
+            int col = j;
+            if (lev.gameOverArtArr[row][col] == '.') {
+                glColor3ub(55, 28, 29); // Converted from hex 371C3B
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.gameOverArtArr[row][col] == '+') {
+                glColor3ub(204, 76, 80); // Converted from hex CC4C50
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.gameOverArtArr[row][col] == '@') {
+                glColor3ub(207, 125, 122); // Converted from hex CF7D7A
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.gameOverArtArr[row][col] == '#') {
+                glColor3ub(159, 44, 92); // Converted from hex 9F2C5C
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.gameOverArtArr[row][col] == '$') {
+                glColor3ub(208, 80, 134); // Converted from hex D05086
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.gameOverArtArr[row][col] == '%') {
+                glColor3ub(101, 54, 100); // Converted from hex 653664
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+            if (lev.gameOverArtArr[row][col] == '&') {
+                glColor3ub(165, 92, 165); // Converted from hex A55CA5
+                renderSquare(burger, j, i, dd, offy, tx, ty);
+            }
+
+        }
+    }
+}
 
 void renderTitleArt(Square burger, Level lev) {
     int tx = lev.tilesize[0];
@@ -336,8 +378,8 @@ void renderBurger(Square burger, Level lev, Global gl, bool shieldState) {
 
             if (lev.burgerArr[row][col] == '.') {
                 if (shieldState) {
-                glColor3ub(95, 205, 228);
-                renderSquare(burger, j, i, dd, offy, tx, ty);    
+                    glColor3ub(95, 205, 228);
+                    renderSquare(burger, j, i, dd, offy, tx, ty);    
                 } else {
                     glColor3ub(0, 0, 0);
                     renderSquare(burger, j, i, dd, offy, tx, ty);

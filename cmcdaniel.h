@@ -45,6 +45,7 @@ extern void renderTramp(Square burger, Level lev);
 extern void renderKnifeBlock(Square burger, Level lev);
 extern void renderHealth(Square burger, Level lev);
 extern void renderTitleArt(Square burger, Level lev);
+extern void renderGameOverArt(Square burger, Level lev);
 extern void renderSquare(Square burger, int j, int i, Flt dd, Flt offy, int tx, int ty);
 class cameron{
 	int abc;
