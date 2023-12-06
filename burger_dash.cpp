@@ -151,24 +151,27 @@ void waitForEnterKey(X11_wrapper &x11) {
 void initObj()
 {
     //initialize knives in the air
-    knife1.pos[0] = gl.xres + knife1.width;
+    knife1.pos[0] = gl.xres + knife1.width + 1000;
     knife1.pos[1] = gl.yres / 4.0;
     knife1.width = 13.0;
-    knife1.vel[0] = -40;
+    knife1.vel[0] = -35;
     knife1.height = 5.0;
+    knife1.active = true;
 
 
-    knife2.pos[0] = gl.xres + knife2.width + 20.0;
+    knife2.pos[0] = gl.xres + knife2.width + 1020;
     knife2.pos[1] = (gl.yres / 4.0) + 20.0;
     knife2.width = 13.0;
-    knife2.vel[0] = -40;
+    knife2.vel[0] = -35;
     knife2.height = 5.0;
+    knife2.active = true;
 
-    knife3.pos[0] = gl.xres + knife3.width + 20;
+    knife3.pos[0] = gl.xres + knife3.width + 1020;
     knife3.pos[1] = (gl.yres / 4.0) - 20.0;
     knife3.width = 13.0;
-    knife3.vel[0] = -40;
+    knife3.vel[0] = -35;
     knife3.height = 5.0;
+    knife3.active = true;
     // Initialize shield power-up
     shieldPowerUp.init();
 }
