@@ -20,6 +20,7 @@ class Level {
     unsigned char knifeArtArr[5][13];
     unsigned char knifeBlockArtArr[18][32];
     unsigned char healthArtArr[9][9];
+    unsigned char gameOverArtArr[35][58];
     std::string imageName;
     int nrows, ncols;
     int tilesize[2];

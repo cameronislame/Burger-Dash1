@@ -80,6 +80,8 @@ Level::Level(int tileSizeX, int tileSizeY, std::string fileName) {
                     knifeBlockArtArr[nrows][j] = line[j];
                 if (imageName == "health.xpm")
                     healthArtArr[nrows][j] = line[j];
+                if (imageName == "gameOver.xpm")
+                    gameOverArtArr[nrows][j] = line[j];
             }
             ++nrows;
         }
