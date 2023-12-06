@@ -323,7 +323,7 @@ void renderTitleArt(Square burger, Level lev) {
 }
 
 
-void renderBurger(Square burger, Level lev, Global gl) {
+void renderBurger(Square burger, Level lev, Global gl, bool shieldState) {
     int tx = lev.tilesize[0];
     int ty = lev.tilesize[1];
     Flt dd = lev.ftsz[0];
@@ -335,8 +335,13 @@ void renderBurger(Square burger, Level lev, Global gl) {
             int col = j;
 
             if (lev.burgerArr[row][col] == '.') {
-                glColor3ub(0, 0, 0);
-                renderSquare(burger, j, i, dd, offy, tx, ty);
+                if (shieldState) {
+                glColor3ub(95, 205, 228);
+                renderSquare(burger, j, i, dd, offy, tx, ty);    
+                } else {
+                    glColor3ub(0, 0, 0);
+                    renderSquare(burger, j, i, dd, offy, tx, ty);
+                }
             }
             if (lev.burgerArr[row][col] == '+') {
                 glColor3ub(165,112,58);

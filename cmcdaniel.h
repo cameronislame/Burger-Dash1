@@ -38,7 +38,7 @@ extern void display_credits(int xres, int yres);
 extern int total_running_time(time_t begin);
 extern int time_since_mouse_move(const bool get);
 extern void renderLevel(Level lev, Global gl, double* camera);
-extern void renderBurger(Square burger, Level lev,  Global gl);
+extern void renderBurger(Square burger, Level lev,  Global gl, bool shieldState);
 extern void renderFire(Square burger, Level lev);
 extern void renderKnife(Square burger, Level lev);
 extern void renderTramp(Square burger, Level lev);

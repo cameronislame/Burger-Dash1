@@ -602,7 +602,7 @@ void physics()
     }
 }
 
-
+bool shieldState;
 void render()
 {
 
@@ -613,7 +613,8 @@ void render()
 
     renderHealth();
     renderLevel(lev, gl, camera);
-    renderBurger(burger, burgerSprite, gl);
+    shieldState = shieldPowerUp.isActivated();
+    renderBurger(burger, burgerSprite, gl, shieldState);
 
     //renderEnemy();   
 
