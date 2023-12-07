@@ -37,7 +37,7 @@ double camera[2] = {0.0,0.0};
 
 //set up timers
 
-const double physicsRate = 1.0/30.0;
+const double physicsRate = 1.0/20.0;
 extern struct timespec timeStart, timeCurrent;
 extern struct timespec timePause;
 extern double physicsCountdown;
@@ -114,7 +114,10 @@ Level trampArtSprite(5.0f, 5.0f, "trampoline.xpm");
 Level knifeBlockArtSprite(3.0f, 3.0f, "knifeBlock.xpm");
 Level healthArtSprite(5.0f, 5.0f, "health.xpm");
 Level gameOverSprite(5.0f, 5.0f, "gameOver.xpm");
+Level exitSprite(5.0f, 5.0f, "exit.xpm");
+Square exitSquare;
 Square gameOverSquare;
+Square exitHelper;
 Square trampSquare;
 Square fireSquare;
 Square knifeSquare1;
@@ -193,6 +196,11 @@ int main() {
     // Render knife and hp pack
     init_hpPack();
     initObj();
+    exitSquare.width = 13.0f;
+    exitSquare.height = 29.0f;
+    exitSquare.pos[0] = 1000;
+    exitSquare.pos[1] = 0;
+    exitSquare.active = false;
     //Main loop
     int done = 0;
     while (!done) {
@@ -389,6 +397,12 @@ int X11_wrapper::check_keys(XEvent *e)
                 initObj();//knife intializer
                 init_hpPack();
                 gameOver=false;
+                exitSquare.width = 13.0f;
+                exitSquare.height = 29.0f;
+                exitSquare.pos[0] = 1000;
+                exitSquare.pos[1] = 0;
+                exitSquare.active = false;
+
                 break;
             case XK_Escape:
                 //Escape key was pressed
@@ -490,7 +504,7 @@ void physics()
     //hp pack physics
     hp_pack.pos[0] += hp_pack.vel[0];
     if (hp_pack.pos[0] + hp_pack.width < 0.0) {
-        init_hpPack();
+        hp_pack.pos[0] = oil.pos[0] + 300;
     }
     // knife physics
     knife1.pos[0] += knife1.vel[0];
@@ -543,6 +557,11 @@ void physics()
     }
 
     // if they collide, send burger back a bit
+    if(checkCollision (burger, exitSquare)) {
+        std::cout << "we did it" << endl;
+        exit(1);
+    }
+    
     if(checkCollision(burger, spike)) {
         //spike.vel[0] = 10;
 
@@ -562,8 +581,12 @@ void physics()
     }
 
     if (spike.pos[0] + spike.width < 0) {
-        spike.init();
+        spike.pos[0] = burger.pos[0] + 1000;
+        spike.pointClaimed = false;
 
+    }
+    if ( oil.pos[0] + oil.width < 0) {
+        oil.pos[0] = burger.pos[0] + 1500;
     }
 
     if(Check2(burger,enemy)){
@@ -571,16 +594,16 @@ void physics()
             burger.vel[0] = enemy.vel[0];
     }
 
-    for(int i = 0; i<50; i++){
-        // render the level while burger is in motion
-        if(burger.vel[0] >= 0.0){
-            camera[0] += 2.0/lev.tilesize[0] * (0.05 / gl.delay);
-            if (camera[0] < 0.0) {
-                camera[0] = 0.0;
-            }
+    if (gl.score >= 2) {
+        exitSquare.active = true;
+        exitSquare.pos[0] += -5.0f;
+
+        if (exitSquare.pos[0] + exitSquare.width < 0) {
+            std::cout << exitSquare.width;
+            std::cout << knife1.width;
+            exitSquare.pos[0] = burger.pos[0] + 2200;
         }
     }
-
     // if we clear the obstacle we get a point
     if (burger.pos[0] - burger.width > spike.pos[0] + spike.width && !spike.pointClaimed) {
         spike.pointClaimed = true;
@@ -600,11 +623,22 @@ void physics()
     if (Check3(burger,oil)) {
         burger.vel[1] = -20.0;
     }
+
 }
 
 bool shieldState;
 void render()
 {
+
+    for(int i = 0; i<50; i++){
+        // render the level while burger is in motion
+        if(burger.vel[0] >= 0.0){
+            camera[0] += 2.0/lev.tilesize[0] * (0.05 / gl.delay);
+            if (camera[0] < 0.0) {
+                camera[0] = 0.0;
+            }
+        }
+    }
 
     render_calls();
 
@@ -686,6 +720,15 @@ void render()
         glVertex2f(shieldPowerUp.width, -shieldPowerUp.height);
         glEnd();
         glPopMatrix();
+    }
+
+    if(exitSquare.active) {
+        exitHelper.width = 5.0f;
+        exitHelper.height = 5.0f;
+        exitHelper.pos[0] = exitSquare.pos[0];
+        exitHelper.pos[1] = exitSquare.pos[1];
+        renderExitArt(exitHelper, exitSprite);
+
     }
 
     unsigned int c = 0x00ffff44;
